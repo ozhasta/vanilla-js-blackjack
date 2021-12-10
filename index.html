@@ -5,20 +5,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <!-- <script src="settings.js" defer></script> -->
     <script src="app.js" defer></script>
     <title>BlackJack</title>
   </head>
   <body>
-    <!-- <div class="game-settings">
-      <form name="settings">
+    <!-- start of settings-container div -->
+    <div id="settings-container">
+      <form name="settings" onSubmit="return false;">
         <div class="settings-section">
           <p>How many decks do you want to play with?</p>
-          <input type="range" id="numOfDecksInput" value="4" min="1" max="8" oninput="output.value = numOfDecksInput.value" />
+          <input
+            type="range"
+            id="numberOfDecksInput"
+            value="4"
+            min="2"
+            max="8"
+            step="2"
+            oninput="output.value = numberOfDecksInput.value"
+          />
           <output id="output">4</output>
         </div>
         <div class="settings-section">
-          <p>How much of the deck should be dealt to prevent card counting?</p>
+          <p>How much of the deck must be dealt before shuffle to avoid card counting?</p>
           <input type="radio" id="choice1" name="prevent-card-counting" value="100" />
           <label for="choice100">100%</label>
           <input type="radio" id="choice2" name="prevent-card-counting" value="75" checked />
@@ -41,27 +49,20 @@
           <input type="radio" id="gray" name="deck-color" value="gray" />
           <label for="gray"><img src="others/gray_back.png" /></label>
         </div>
+        <div class="settings-section">
+          <p>What is your name?</p>
+          <input type="text" id="player-name-input" name="player-name-input" value="Player" />
+        </div>
         <button form="settings" id="play-btn">Play</button>
       </form>
-    </div> -->
-    <div id="balance"><span>Bank: </span><span id="bank-balance">$1000</span></div>
-    <div class="remaining-cards"><span>104</span> <img src="/others/remaining-cards.png" /></div>
-    <span id="dealer-round-total" class="round-total">10</span><span class="name">Dealer</span>
-    <div class="dealerHand">
-      <div class="cards"></div>
     </div>
-    <div id="round">
-      <button id="hit" class="game-btn">Hit</button>
-      <button id="double" class="game-btn">Double</button>
-      <span id="round-bet">$100</span>
-      <button id="stand" class="game-btn">Stand</button>
-      <button id="split" class="game-btn">Split</button>
-    </div>
-    <div class="playerHand">
-      <div class="cards"></div>
-    </div>
-    <span id="player-round-total" class="round-total">20</span><span class="name">Player</span>
-    <div id="bank-container">
+    <!-- end of settings-container div -->
+    <!-- start of game-container div -->
+    <div id="betting-container" class="hidden">
+      <div>
+        <span>$<span>100</span></span>
+        <button id="bet-btn" class="game-btn">BET</button>
+      </div>
       <div id="bank">
         <div class="control-chips">
           <div class="chip red">5</div>
@@ -75,5 +76,25 @@
         <button id="allin-btn" class="game-btn">ALL IN</button>
       </div>
     </div>
+    <div id="game-container" class="hidden">
+      <div id="balance"><span>Bank: </span><span id="bank-balance">$1000</span></div>
+      <div class="remaining-cards"><span>0</span> <img src="/others/remaining-cards.png" /></div>
+      <span id="dealer-round-total" class="round-total">0</span><span>Dealer</span>
+      <div class="dealerHand">
+        <div class="cards"></div>
+      </div>
+      <div id="round">
+        <button id="hit-btn" class="game-btn">Hit</button>
+        <button id="double-btn" class="game-btn">Double</button>
+        <span id="round-bet">$0</span>
+        <button id="stand-btn" class="game-btn">Stand</button>
+        <!-- <button id="split" class="game-btn">Split</button> -->
+      </div>
+      <div class="playerHand">
+        <div class="cards"></div>
+      </div>
+      <span id="player-round-total" class="round-total">0</span><span id="player-name-output">Player</span>
+    </div>
+    <!-- end of game-container div-->
   </body>
 </html>
