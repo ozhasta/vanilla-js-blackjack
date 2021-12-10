@@ -25,8 +25,21 @@ body {
   font-size: 2rem;
   margin: var(--game-container-margin);
   height: calc(100vh - (var(--game-container-margin) * 2));
-  overflow: hidden;
+  /* overflow: hidden; */
 }
+/* #game-container {
+  display: none;
+}
+#settings-container {
+  display: none;
+} */
+/* #bettin-container {
+  display: none;
+} */
+.hidden {
+  display: none;
+}
+
 #balance {
   position: fixed;
   top: 4rem;
@@ -54,6 +67,7 @@ body {
   border-radius: 50%;
   background-color: var(--transparent-background);
   font-size: 3rem;
+  margin-right: 1rem;
   /* color: red; */
 }
 #round-bet {
@@ -66,15 +80,6 @@ body {
   /* box-shadow: 0px 0px 20px 5px darkslategray; */
   min-width: 10rem;
 }
-.name {
-  margin-left: 1rem;
-}
-/* .dealerHand {
-  margin: 0.5em;
-}
-.playerHand {
-  margin-top: 1em;
-} */
 
 .card {
   display: inline-block;
@@ -169,6 +174,10 @@ controls
   cursor: not-allowed;
 }
 
+#bet-btn {
+  margin-top: 40vh;
+}
+
 /**********
 controls bank section
 **********/
@@ -180,11 +189,7 @@ controls bank section
   display: flex;
   justify-content: center;
 }
-#bank-container {
-  /* position: relative; */
-  /* opacity: 1; */
-  display: none;
-}
+
 #bank {
   position: fixed;
   background-color: var(--transparent-background);
@@ -222,6 +227,15 @@ form img {
   width: 3em;
   padding-right: 1em;
 }
+#player-name-input {
+  padding: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.settings-section label {
+  padding-right: 2rem;
+}
 
 /**********
 all in button
@@ -246,8 +260,8 @@ all in button
   color: #000000;
 }
 #allin-btn:hover {
-  -webkit-animation: burn 1000ms ease-out forwards;
-  animation: burn 1000ms ease-out forwards;
+  -webkit-animation: burn 1100ms ease-out forwards;
+  animation: burn 1100ms ease-out forwards;
 }
 #allin-btn:hover::before {
   content: "";
@@ -257,8 +271,8 @@ all in button
   height: 40px;
   background: #ffe66e;
   border-radius: 100%;
-  -webkit-animation: flare 1000ms ease-out forwards;
-  animation: flare 1000ms ease-out forwards;
+  -webkit-animation: flare 1100ms ease-out forwards;
+  animation: flare 1100ms ease-out forwards;
 }
 #allin-btn:hover::after {
   content: "";
@@ -268,8 +282,8 @@ all in button
   height: 40px;
   background: #ffe66e;
   border-radius: 100%;
-  -webkit-animation: flare 1000ms ease-out forwards;
-  animation: flare 1000ms ease-out forwards;
+  -webkit-animation: flare 1100ms ease-out forwards;
+  animation: flare 1100ms ease-out forwards;
 }
 
 @-webkit-keyframes flare {
