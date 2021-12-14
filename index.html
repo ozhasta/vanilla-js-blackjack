@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#004526" />
+
     <link rel="stylesheet" href="style.css" />
     <script src="app.js" defer></script>
     <title>BlackJack</title>
@@ -26,7 +28,8 @@
           <output id="output">4</output>
         </div>
         <div class="settings-section">
-          <p>How much of the deck must be dealt before shuffle to avoid card counting?</p>
+          <p>How much of the deck must be dealt before shuffling?</p>
+          <p>(Useful for avoiding card counting.)</p>
           <input type="radio" id="choice1" name="prevent-card-counting" value="100" />
           <label for="choice100">100%</label>
           <input type="radio" id="choice2" name="prevent-card-counting" value="75" checked />
@@ -36,18 +39,31 @@
         </div>
         <div class="settings-section">
           <p>Which color deck will you play with?</p>
-          <input type="radio" id="blue" name="deck-color" value="blue" checked />
-          <label for="blue"><img src="others/blue_back.png" /></label>
-          <input type="radio" id="red" name="deck-color" value="red" />
-          <label for="red"><img src="others/red_back.png" /></label>
-          <input type="radio" id="green" name="deck-color" value="green" />
-          <label for="green"><img src="others/green_back.png" /></label>
-          <input type="radio" id="yellow" name="deck-color" value="yellow" />
-          <label for="yellow"><img src="others/yellow_back.png" /></label>
-          <input type="radio" id="purple" name="deck-color" value="purple" />
-          <label for="purple"><img src="others/purple_back.png" /></label>
-          <input type="radio" id="gray" name="deck-color" value="gray" />
-          <label for="gray"><img src="others/gray_back.png" /></label>
+          <div>
+            <input type="radio" id="blue" name="deck-color" value="blue" checked />
+            <label for="blue"><img src="others/blue_back.png" /></label>
+          </div>
+          <div>
+            <input type="radio" id="red" name="deck-color" value="red" />
+            <label for="red"><img src="others/red_back.png" /></label>
+          </div>
+          <div>
+            <input type="radio" id="green" name="deck-color" value="green" />
+            <label for="green"><img src="others/green_back.png" /></label>
+          </div>
+          <br />
+          <div>
+            <input type="radio" id="yellow" name="deck-color" value="yellow" />
+            <label for="yellow"><img src="others/yellow_back.png" /></label>
+          </div>
+          <div>
+            <input type="radio" id="purple" name="deck-color" value="purple" />
+            <label for="purple"><img src="others/purple_back.png" /></label>
+          </div>
+          <div>
+            <input type="radio" id="gray" name="deck-color" value="gray" />
+            <label for="gray"><img src="others/gray_back.png" /></label>
+          </div>
         </div>
         <div class="settings-section">
           <p>What is your name?</p>
@@ -58,10 +74,15 @@
     </div>
     <!-- end of settings-container div -->
     <!-- start of game-container div -->
+    <div id="balance" class="hidden">
+      <div>Bank:</div>
+      <span>$<span id="bank-balance">0</span></span>
+    </div>
+
     <div id="betting-container" class="hidden">
-      <div>
-        <span>$<span>100</span></span>
+      <div id="bet-mid">
         <button id="bet-btn" class="game-btn">BET</button>
+        <span>$<span id="first-bet">0</span></span>
       </div>
       <div id="bank">
         <div class="control-chips">
@@ -70,31 +91,31 @@
           <div class="chip lblue">100</div>
           <div class="chip purple">250</div>
           <div class="chip dblue">500</div>
-          <div class="chip dblue disabled">500</div>
         </div>
         <button id="clear-btn" class="game-btn">CLEAR BET</button>
         <button id="allin-btn" class="game-btn">ALL IN</button>
       </div>
     </div>
     <div id="game-container" class="hidden">
-      <div id="balance"><span>Bank: </span><span id="bank-balance">$1000</span></div>
-      <div class="remaining-cards"><span>0</span> <img src="/others/remaining-cards.png" /></div>
+      <div class="remaining-cards"><img src="/others/remaining-cards.png" /><br /><span>0</span></div>
       <span id="dealer-round-total" class="round-total">0</span><span>Dealer</span>
       <div class="dealerHand">
         <div class="cards"></div>
       </div>
       <div id="round">
         <button id="hit-btn" class="game-btn">Hit</button>
-        <button id="double-btn" class="game-btn">Double</button>
-        <span id="round-bet">$0</span>
+        <button id="double-btn" class="chip">X2</button>
+        <span>$<span id="round-bet">0</span></span>
         <button id="stand-btn" class="game-btn">Stand</button>
         <!-- <button id="split" class="game-btn">Split</button> -->
       </div>
       <div class="playerHand">
         <div class="cards"></div>
+        <!-- <div class="ribbon ribbon-lose">Busted</div> -->
       </div>
       <span id="player-round-total" class="round-total">0</span><span id="player-name-output">Player</span>
     </div>
+    <div id="splash-screen"></div>
     <!-- end of game-container div-->
   </body>
 </html>
