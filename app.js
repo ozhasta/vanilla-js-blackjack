@@ -12,6 +12,10 @@ const bankBalanceEl = document.querySelector("#bank-balance")
 const firstBetEl = document.querySelector("#first-bet")
 const controlChipsEl = document.querySelector(".control-chips")
 const chipBtnsEl = document.querySelectorAll(".control-chips > .chip")
+const roundBetEl = document.querySelector("#round-bet")
+const clearBetBtnEl = document.querySelector("#clear-btn")
+const allinBtnEl = document.querySelector("#allin-btn")
+
 let playerRoundTotal = 0
 let dealerRoundTotal = 0
 let playersTurn = false
@@ -50,56 +54,71 @@ function saveSettings() {
   playerNameOutputEl.textContent = playerName
 
   bankBalanceEl.textContent = bankBalance
-  //handleChipButtons()
+  bankBalanceRestorePoint = bankBalance
 
   document.getElementById("settings-container").classList.toggle("hidden")
   document.getElementById("betting-container").classList.toggle("hidden")
   document.getElementById("balance").classList.toggle("hidden")
 
+  checkBalanceForButtons()
   betting()
 }
+
+/****************
+betting section
+*****************/
+
+const betBtnEl = document.querySelector("#bet-btn")
 function betting() {
-  const betBtnEl = document.querySelector("#bet-btn")
   betBtnEl.addEventListener("click", () => {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
-
+    roundBetEl.textContent = currentBet
     startRound()
   })
 }
 
 // check balance for disabled chip buttons
-function handleChipButtons() {
+function checkBalanceForButtons() {
   chipBtnsEl.forEach((btn) => {
-    if (Number(btn.textContent) <= bankBalance) {
-      btn.addEventListener("click", (e) => {
-        const clickedBtn = e.target
-        bankBalanceRestorePoint = bankBalance
-        currentBet += Number(clickedBtn.textContent)
-        firstBetEl.textContent = currentBet
-        bankBalance -= Number(clickedBtn.textContent)
-        bankBalanceEl.textContent = bankBalance
-      })
-      btn.classList.remove("disabled")
-    } else if (Number(btn.textContent) > bankBalance) {
-      // buraya galiba foreach eklicin
-      btn.classList.add("disabled")
-      btn.removeEventListener("click")
-    }
+    // if target chip's bet value bigger then bankBalance disable that chip
+    btn.disabled = Number(btn.textContent) > bankBalance ? true : false
   })
+  // if current bet equals to 0 then disable clearBet button
+  clearBetBtnEl.disabled = currentBet === 0 ? true : false
+  // if bank balance equals to 0 then disable allin button
+  allinBtnEl.disabled = bankBalance === 0 ? true : false
 }
 
-// add event listener to control-chips
+// add event listener to control-chips div
+controlChipsEl.addEventListener("click", (e) => {
+  const clickedBtn = e.target
+  if (clickedBtn.classList.contains("chip")) {
+    bankBalanceRestorePoint = bankBalanceRestorePoint ? bankBalanceRestorePoint : bankBalance
+    if (bankBalanceRestorePoint) currentBet += Number(clickedBtn.textContent)
+    firstBetEl.textContent = currentBet
+    bankBalance -= Number(clickedBtn.textContent)
+    bankBalanceEl.textContent = bankBalance
+    checkBalanceForButtons()
+  }
+})
 
-// btn.addEventListener("click", (e) => {
-//   const clickedBtn = e.target
-//   bankBalanceRestorePoint = bankBalance
-//   currentBet += Number(clickedBtn.textContent)
-//   firstBetEl.textContent = currentBet
-//   bankBalance -= Number(clickedBtn.textContent)
-//   bankBalanceEl.textContent = bankBalance
-// })
+clearBetBtnEl.addEventListener("click", () => {
+  currentBet = 0
+  firstBetEl.textContent = currentBet
+  bankBalance = bankBalanceRestorePoint
+  bankBalanceEl.textContent = bankBalanceRestorePoint
+
+  checkBalanceForButtons()
+})
+allinBtnEl.addEventListener("click", () => {
+  currentBet += bankBalance
+  firstBetEl.textContent = currentBet
+  bankBalance = 0
+  bankBalanceEl.textContent = bankBalance
+  checkBalanceForButtons()
+})
 
 /****************
 game section
@@ -210,7 +229,7 @@ function insertDealerCardToDOM() {
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
-  disableButtons()
+  disableRoundButtons()
 
   insertDealerCardToDOM()
   console.log("oyuncu kalkti")
@@ -219,38 +238,47 @@ function stand() {
 const doubleBtnEl = document.querySelector("#double-btn")
 doubleBtnEl.addEventListener("click", double)
 function double() {
-  console.log("oyuncu iki katini istedi")
-  disableButtons()
-  insertPlayerCardToDOM()
-  insertDealerCardToDOM()
+  if (currentBet < bankBalance) {
+    console.log("oyuncu iki katini istedi")
+    bankBalance = bankBalance - currentBet
+    bankBalanceEl.textContent = bankBalance
+    currentBet = currentBet * 2
+    roundBetEl.textContent = currentBet
+
+    disableRoundButtons()
+    insertPlayerCardToDOM()
+    insertDealerCardToDOM()
+  }
 }
 
 function playerBusted() {
-  disableButtons()
+  disableRoundButtons()
   console.log("oyuncu patladi")
 }
 function dealerBusted() {
   console.log("dealer patladi")
 }
 function playerBJ() {
-  disableButtons()
+  disableRoundButtons()
   insertDealerCardToDOM()
   console.log("oyuncu elden BlackJack yapti")
 }
 function player21() {
-  disableButtons()
+  disableRoundButtons()
   console.log("oyuncu 21 e ulasti")
 }
 function dealer17() {
   console.log("dealer 17 ye ulasti")
 }
-function disableButtons() {
+function disableRoundButtons() {
   hitBtnEl.disabled = true
   standBtnEl.disabled = true
   doubleBtnEl.disabled = true
 }
 
 function startRound() {
+  // if balance is not enougth for doubling bet disable doubleBtn
+  doubleBtnEl.disabled = bankBalance < currentBet ? true : false
   currentDeck.push(...shuffle())
   console.log("kagitlar dagitildi")
   dealerHand.push(popThenCount())
