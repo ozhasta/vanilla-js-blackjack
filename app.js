@@ -70,6 +70,12 @@ betting section
 
 const betBtnEl = document.querySelector("#bet-btn")
 function betting() {
+  if (currentBet === 0) {
+    currentBet = 100
+    firstBetEl.textContent = currentBet
+    bankBalance = bankBalance - currentBet
+    bankBalanceEl.textContent = bankBalance
+  }
   betBtnEl.addEventListener("click", () => {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-container").classList.toggle("hidden")
@@ -279,6 +285,7 @@ function disableRoundButtons() {
 function startRound() {
   // if balance is not enougth for doubling bet disable doubleBtn
   doubleBtnEl.disabled = bankBalance < currentBet ? true : false
+
   currentDeck.push(...shuffle())
   console.log("kagitlar dagitildi")
   dealerHand.push(popThenCount())
