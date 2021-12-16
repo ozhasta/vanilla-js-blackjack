@@ -59,6 +59,7 @@ function saveSettings() {
   document.getElementById("settings-container").classList.toggle("hidden")
   document.getElementById("betting-container").classList.toggle("hidden")
   document.getElementById("balance").classList.toggle("hidden")
+  document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
 
   checkBalanceForButtons()
   betting()
@@ -80,6 +81,8 @@ function betting() {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
+    document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
+    document.getElementById("fixed-bottom-game").classList.toggle("hidden")
     roundBetEl.textContent = currentBet
     startRound()
   })

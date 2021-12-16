@@ -29,7 +29,7 @@
         </div>
         <div class="settings-section">
           <p>How much of the deck must be dealt before shuffling?</p>
-          <p>(Useful for avoiding card counting.)</p>
+          <p>(Useful for preventing card counting.)</p>
           <input type="radio" id="choice1" name="prevent-card-counting" value="100" />
           <label for="choice100">100%</label>
           <input type="radio" id="choice2" name="prevent-card-counting" value="75" checked />
@@ -84,7 +84,27 @@
         <button id="bet-btn" class="game-btn">BET</button>
         <span>$<span id="first-bet">0</span></span>
       </div>
-      <div id="bank">
+    </div>
+    <div id="game-container" class="hidden">
+      <div class="remaining-cards"><img src="/others/remaining-cards.png" /><br /><span>0</span></div>
+      <span id="dealer-round-total" class="round-total">0</span><span>Dealer</span>
+      <div class="dealerHand">
+        <div class="cards"></div>
+      </div>
+      <div id="round">
+        <button id="double-btn" class="chip">X2</button>
+        <span>$<span id="round-bet">0</span></span>
+      </div>
+      <div class="playerHand">
+        <div class="cards"></div>
+        <!-- <div class="ribbon ribbon-lose">Busted</div> -->
+      </div>
+      <span id="player-round-total" class="round-total">0</span><span id="player-name-output">Player</span>
+    </div>
+    <!-- end of game-container div-->
+    <!-- <div id="splash-screen"></div> -->
+    <div class="fixed-bottom">
+      <div id="fixed-bottom-betting" class="hidden">
         <div class="control-chips">
           <button class="chip red">5</button>
           <button class="chip orange">25</button>
@@ -95,27 +115,11 @@
         <button id="clear-btn" class="game-btn">CLEAR BET</button>
         <button id="allin-btn" class="game-btn">ALL IN</button>
       </div>
-    </div>
-    <div id="game-container" class="hidden">
-      <div class="remaining-cards"><img src="/others/remaining-cards.png" /><br /><span>0</span></div>
-      <span id="dealer-round-total" class="round-total">0</span><span>Dealer</span>
-      <div class="dealerHand">
-        <div class="cards"></div>
-      </div>
-      <div id="round">
+      <div id="fixed-bottom-game" class="hidden">
         <button id="hit-btn" class="game-btn">Hit</button>
-        <button id="double-btn" class="chip">X2</button>
-        <span>$<span id="round-bet">0</span></span>
         <button id="stand-btn" class="game-btn">Stand</button>
         <!-- <button id="split" class="game-btn">Split</button> -->
       </div>
-      <div class="playerHand">
-        <div class="cards"></div>
-        <!-- <div class="ribbon ribbon-lose">Busted</div> -->
-      </div>
-      <span id="player-round-total" class="round-total">0</span><span id="player-name-output">Player</span>
     </div>
-    <div id="splash-screen"></div>
-    <!-- end of game-container div-->
   </body>
 </html>
