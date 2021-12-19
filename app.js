@@ -15,6 +15,8 @@ const chipBtnsEl = document.querySelectorAll(".control-chips > .chip")
 const roundBetEl = document.querySelector("#round-bet")
 const clearBetBtnEl = document.querySelector("#clear-btn")
 const allinBtnEl = document.querySelector("#allin-btn")
+const dealerRibbonEl = document.querySelector("#dealer-msg")
+const playerRibbonEl = document.querySelector("#player-msg")
 
 let playerRoundTotal = 0
 let dealerRoundTotal = 0
@@ -71,18 +73,15 @@ betting section
 
 const betBtnEl = document.querySelector("#bet-btn")
 function betting() {
-  if (currentBet === 0) {
-    currentBet = 100
-    firstBetEl.textContent = currentBet
-    bankBalance = bankBalance - currentBet
-    bankBalanceEl.textContent = bankBalance
-  }
   betBtnEl.addEventListener("click", () => {
+    if (currentBet === 0) {
+      return
+    }
     document.getElementById("betting-container").classList.toggle("hidden")
-    document.getElementById("game-container").classList.toggle("hidden")
+    document.getElementById("round-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
     document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
-    document.getElementById("fixed-bottom-game").classList.toggle("hidden")
+    document.getElementById("fixed-bottom-round").classList.toggle("hidden")
     roundBetEl.textContent = currentBet
     startRound()
   })
@@ -139,10 +138,10 @@ game section
   diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
 */
 const deck = {
-  hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
-  spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
-  clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  hearts: ["HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA"],
+  spades: ["HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA"],
+  clubs: ["HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA"],
+  diamonds: ["HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA", "HA"]
 }
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
@@ -151,7 +150,7 @@ function multipleDecks(numOfDeck) {
   for (let i = 0; i < numOfDeck; i++) {
     multipleDecks.push(...fullDeck)
   }
-  console.log("desteler birlestirildi")
+  // console.log("desteler birlestirildi")
   return multipleDecks
 }
 function shuffle() {
@@ -160,7 +159,7 @@ function shuffle() {
     let j = Math.floor(Math.random() * (i + 1))
     ;[arr[i], arr[j]] = [arr[j], arr[i]]
   }
-  console.log("deste karistirildi")
+  // console.log("deste karistirildi")
   return arr
 }
 
@@ -178,10 +177,10 @@ function popThenCount() {
       vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
       roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
       if (roundTotal >= 11) {
-        console.log("as 1 sayildi")
+        //  console.log("as 1 sayildi")
         cardVal = 1
       } else {
-        console.log("as 11 sayildi")
+        //  console.log("as 11 sayildi")
         cardVal = 11
       }
       // gecerli kartin dosya isminde bu karakterler var mi, if ve regex ile test
@@ -206,7 +205,7 @@ function popThenCount() {
       }
     }
     if (playerRoundTotal > 21) {
-      playerBusted()
+      playerBust()
     }
   } else {
     dealerHandEl.innerHTML += `<div class="card"><img src="deck/${poppedCard}.png" /></div>`
@@ -227,28 +226,38 @@ function insertPlayerCardToDOM() {
 }
 function insertDealerCardToDOM() {
   playersTurn = false
-  while (dealerRoundTotal < 18) {
+  // if (playerRoundTotal < 22 && dealerRoundTotal < 22 && dealerRoundTotal > playerRoundTotal) {
+  //   decideWinner()
+  // } else if (playerRoundTotal < 22 && dealerRoundTotal < 22 && playerRoundTotal > dealerRoundTotal) {
+  //   decideWinner()
+  // } else if (playerRoundTotal === dealerRoundTotal) {
+  //   decideWinner()
+  // }
+  while (dealerRoundTotal < 17) {
     dealerHand.push(popThenCount())
     if (dealerRoundTotal > 21) {
-      return dealerBusted()
+      return dealerBust()
     }
+    // else if (dealerRoundTotal < 21 && dealerRoundTotal > 16) {
+    //   return decideWinner()
+    // }
   }
+  decideWinner()
 }
 
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
   disableRoundButtons()
-
   insertDealerCardToDOM()
-  console.log("oyuncu kalkti")
+  // console.log("oyuncu kalkti")
 }
 
 const doubleBtnEl = document.querySelector("#double-btn")
 doubleBtnEl.addEventListener("click", double)
 function double() {
   if (currentBet < bankBalance) {
-    console.log("oyuncu iki katini istedi")
+    // console.log("oyuncu iki katini istedi")
     bankBalance = bankBalance - currentBet
     bankBalanceEl.textContent = bankBalance
     currentBet = currentBet * 2
@@ -260,37 +269,121 @@ function double() {
   }
 }
 
-function playerBusted() {
+function playerBust() {
   disableRoundButtons()
-  console.log("oyuncu patladi")
+  playerRibbonEl.textContent = "Bust"
+  playerRibbonEl.classList.toggle("ribbon-lose")
+  togglePlayerRibbon()
+  // console.log("oyuncu patladi")
+
+  resetRound()
 }
-function dealerBusted() {
-  console.log("dealer patladi")
+function dealerBust() {
+  dealerRibbonEl.textContent = "Bust"
+  dealerRibbonEl.classList.toggle("ribbon")
+  dealerRibbonEl.classList.toggle("ribbon-lose")
+  dealerRibbonEl.classList.toggle("hidden")
+  playerWinRibbon()
+  // console.log("dealer patladi")
+  handlePayment("win")
 }
+function togglePlayerRibbon() {
+  playerRibbonEl.classList.toggle("ribbon")
+  playerRibbonEl.classList.toggle("hidden")
+}
+function toggleDealerRibbon() {
+  dealerRibbonEl.classList.toggle("ribbon")
+  dealerRibbonEl.classList.toggle("hidden")
+}
+function playerWinRibbon() {
+  playerRibbonEl.textContent = "You win!"
+  playerRibbonEl.classList.toggle("ribbon-win")
+  togglePlayerRibbon()
+}
+
+function dealerWinRibbon() {
+  dealerRibbonEl.textContent = "Dealer win!"
+  dealerRibbonEl.classList.toggle("ribbon-win")
+
+  toggleDealerRibbon()
+
+  playerRibbonEl.textContent = "You lose!"
+  playerRibbonEl.classList.toggle("ribbon-lose")
+  togglePlayerRibbon()
+}
+
+function tieRibbon() {
+  dealerRibbonEl.textContent = "Tie - Push"
+  dealerRibbonEl.classList.toggle("ribbon-tie")
+  toggleDealerRibbon()
+
+  playerRibbonEl.textContent = "Tie - Push"
+  playerRibbonEl.classList.toggle("ribbon-tie")
+  togglePlayerRibbon()
+}
+
 function playerBJ() {
   disableRoundButtons()
   insertDealerCardToDOM()
-  console.log("oyuncu elden BlackJack yapti")
+  //  console.log("oyuncu elden BlackJack yapti")
 }
 function player21() {
   disableRoundButtons()
-  console.log("oyuncu 21 e ulasti")
+  insertDealerCardToDOM()
+  // console.log("oyuncu 21 e ulasti")
 }
-function dealer17() {
-  console.log("dealer 17 ye ulasti")
+function decideWinner() {
+  if (playerRoundTotal > dealerRoundTotal) {
+    // console.log("dealer 17 ye ulasti - win")
+    playerWinRibbon()
+    handlePayment("win")
+  } else if (playerRoundTotal < dealerRoundTotal) {
+    // console.log("dealer 17 ye ulasti - lose")
+    dealerWinRibbon()
+    resetRound()
+  } else {
+    let playerHasBJ = playerRoundTotal === 21 && playerHand.length < 3
+    console.log("playerHasBJ➡️", playerHasBJ)
+    let dealerHasBJ = dealerRoundTotal === 21 && dealerHand.length < 3
+    console.log("dealerHasBJ➡️", dealerHasBJ)
+    let player21ButNotBJ = playerRoundTotal === 21 && playerHand.length > 2
+    console.log("player21ButNotBJ➡️", player21ButNotBJ)
+    let dealer21ButNotBJ = dealerRoundTotal === 21 && dealerHand.length > 2
+    console.log("dealer21ButNotBJ➡️", dealer21ButNotBJ)
+    console.log("decide winner calisti")
+
+    if (playerHasBJ && dealer21ButNotBJ) {
+      console.log("player blackjack win")
+    }
+    if (dealerHasBJ && player21ButNotBJ) {
+      console.log("dealer blackjack win")
+    }
+    if (playerHasBJ && dealerHasBJ) {
+      console.log("blackjack tie")
+    }
+    // console.log("dealer 17 ye ulasti - tie")
+    // tieRibbon()
+    // handlePayment("tie")
+  }
 }
 function disableRoundButtons() {
   hitBtnEl.disabled = true
   standBtnEl.disabled = true
   doubleBtnEl.disabled = true
 }
+function resetRoundButtons() {
+  hitBtnEl.disabled = false
+  standBtnEl.disabled = false
+  doubleBtnEl.disabled = false
+}
 
 function startRound() {
   // if balance is not enougth for doubling bet disable doubleBtn
   doubleBtnEl.disabled = bankBalance < currentBet ? true : false
-
-  currentDeck.push(...shuffle())
-  console.log("kagitlar dagitildi")
+  if (currentDeck.length === 0) {
+    currentDeck.push(...shuffle())
+  }
+  //  console.log("kagitlar dagitildi")
   dealerHand.push(popThenCount())
   dealerHand.push(popThenCount())
   playersTurn = true
@@ -298,6 +391,50 @@ function startRound() {
   playerHand.push(popThenCount())
 }
 
+function resetRound() {
+  document.getElementById("splash-screen").classList.toggle("hidden") // buraya dikkat
+  setTimeout(function () {
+    document.getElementById("betting-container").classList.toggle("hidden")
+    document.getElementById("round-container").classList.toggle("hidden")
+    document.getElementById("balance").classList.toggle("balance-move")
+    document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
+    document.getElementById("fixed-bottom-round").classList.toggle("hidden")
+    document.getElementById("splash-screen").classList.toggle("hidden") // buraya dikkat
+    playersTurn = false
+    dealerHand.length = 0
+    dealerHandEl.innerHTML = `<div class="cards"></div>`
+    playerHand.length = 0
+    playerHandEl.innerHTML = `<div class="cards"></div>`
+    dealerRoundTotal = 0
+    dealerRoundTotalEl.textContent = 0
+    playerRoundTotal = 0
+    playerRoundTotalEl.textContent = 0
+    currentBet = 0
+    firstBetEl.textContent = 0
+    // reset ribbon classes
+    dealerRibbonEl.className = "hidden"
+    playerRibbonEl.className = "hidden"
+    resetRoundButtons()
+  }, 4000)
+}
 /****************
 computing balance
 *****************/
+function handlePayment(status) {
+  switch (status) {
+    case "tie":
+      bankBalance += currentBet
+      bankBalanceEl.textContent = bankBalance
+      break
+    case "win":
+      bankBalance += currentBet * 2
+      bankBalanceEl.textContent = bankBalance
+      break
+    case "bj":
+      break
+    default:
+      console.log("switch - case hatali")
+      break
+  }
+  resetRound()
+}

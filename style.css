@@ -1,7 +1,6 @@
 :root {
-  --game-container-margin: 1rem;
   --transparent-background: rgba(255, 255, 255, 0.2);
-  --card-size: 24vh;
+  --card-size: 25vh;
 }
 *,
 ::before,
@@ -23,22 +22,15 @@ body {
   font-family: Arial, sans-serif;
   font-weight: 700;
   font-size: 2rem;
-  margin: var(--game-container-margin);
-  height: calc(100vh - (var(--game-container-margin) * 2));
+  height: 100vh;
   /* overflow: hidden; */
 }
-/* #game-container {
-  display: none;
+main {
+  padding-top: 2vh;
 }
-#settings-container {
-  display: none;
-} */
-/* #bettin-container {
-  display: none;
-} */
+
 .hidden {
   display: none;
-  /* animation: fadeout 1s; */
 }
 
 #balance {
@@ -48,19 +40,16 @@ body {
 }
 .balance-move {
   position: fixed !important;
-  top: 3rem !important;
-  left: 3rem !important;
+  top: 10rem !important;
+  left: 2rem !important;
   font-size: 2rem !important;
   padding-top: 0 !important;
 }
-#bet-mid > span {
-  font-size: 3rem;
-  margin-left: 3rem;
-}
+
 .remaining-cards {
   position: fixed;
-  top: 3rem;
-  right: 3rem;
+  top: 2rem;
+  left: 2rem;
 }
 .remaining-cards img {
   width: 4rem;
@@ -75,14 +64,18 @@ body {
 }
 
 .round-total {
-  display: inline-block;
-  padding: 2rem;
-  min-width: 7rem;
+  position: relative;
+  padding: 1.25rem;
+  width: 7rem;
+  height: 7rem;
+  background-color: #929292;
+  color: #3f3f3f;
+  font-size: 4rem;
   border-radius: 50%;
-  background-color: var(--transparent-background);
-  font-size: 2.8rem;
-  margin: 0.8rem 1.2rem;
+  margin-top: -3.5rem;
+  margin-left: -3.5rem;
 }
+
 #round span {
   font-size: 3rem;
 }
@@ -100,25 +93,33 @@ body {
 .card img {
   height: var(--card-size);
 }
+.nick-name {
+  margin-right: calc((var(--card-size) / 2.7));
+}
 #splash-screen {
-  display: none;
   flex-direction: column;
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 65%);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0.8) 75%);
   justify-content: center;
   align-items: center;
   color: #fff;
   font-size: 4rem;
+  animation: splasheffect 1.5s;
 }
-
-@keyframes balanceeffect {
+@keyframes splasheffect {
   0% {
-    transform: translateY(3rem) translateX(3rem) scale(1.3);
+    opacity: 0;
+    /* background: radial-gradient(circle, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 65%); */
+  }
+  50% {
+    /* opacity: 1; */
+    /* background: radial-gradient(circle, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 65%); */
   }
 
   100% {
-    transform: translateY(0rem) translatex(0rem) scale(1);
+    opacity: 1;
+    /* background: radial-gradient(circle, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.9) 65%); */
   }
 }
 
@@ -137,118 +138,58 @@ body {
   }
 }
 
+@keyframes ribboneffect {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    background-color: #fff;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /**********
 ribbon
 **********/
 
 .ribbon {
+  --ribbon-opacity: 0.9;
   --ribbon-win-color: #451;
-  --ribbon-win-background: #9b2;
-  --ribbon-win-shadow: #791;
+  --ribbon-win-background: rgba(154, 187, 34, var(--ribbon-opacity));
   --ribbon-tie-color: #444;
-  --ribbon-tie-background: #999;
-  --ribbon-tie-shadow: #777;
+  --ribbon-tie-background: rgba(153, 153, 153, var(--ribbon-opacity));
   --ribbon-lose-color: #5e0b0c;
-  --ribbon-lose-background: #d33a53;
-  --ribbon-lose-shadow: #991111;
+  --ribbon-lose-background: rgba(211, 58, 83, var(--ribbon-opacity));
 
-  box-sizing: content-box;
   position: absolute;
-  margin-top: 7vh;
-  width: calc((var(--card-size) * 1.25));
-  font-size: 3rem;
-  line-height: 6rem;
-  text-align: center;
-  border-radius: 4px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.15) inset, 0 6px 10px rgba(0, 0, 0, 0.15);
+  margin-right: 4rem;
+  margin-top: calc((var(--card-size) / 2) - 2rem);
+  width: calc((var(--card-size) * 1.5));
+  font-size: 2.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  opacity: 0.95;
+  animation: ribboneffect 1.5s;
 }
+
 /* ribbon-win */
-.ribbon-win::before,
-.ribbon-win::after {
-  box-sizing: content-box;
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: -7rem;
-  top: 2rem;
-  width: 4rem;
-  border: 30px solid var(--ribbon-win-background); /*bg*/
-  border-right: 20px solid var(--ribbon-win-shadow); /*sh*/
-  border-left-color: transparent;
-  transform: rotate(-5deg);
-}
-
-.ribbon-win::after {
-  box-sizing: content-box;
-  left: auto;
-  right: -7rem;
-  border-left: 20px solid var(--ribbon-win-shadow); /*sh*/
-  border-right: 30px solid transparent;
-  transform: rotate(5deg);
-}
-
 .ribbon-win {
-  color: var(--ribbon-win-color); /*cl*/
-  background: var(--ribbon-win-background); /*bg*/
+  color: var(--ribbon-win-color);
+  background: var(--ribbon-win-background);
 }
+
 /* ribbon-tie */
-.ribbon-tie::before,
-.ribbon-tie::after {
-  box-sizing: content-box;
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: -7rem;
-  top: 2rem;
-  width: 4rem;
-  border: 30px solid var(--ribbon-tie-background); /*bg*/
-  border-right: 20px solid var(--ribbon-tie-shadow); /*sh*/
-  border-left-color: transparent;
-  transform: rotate(-5deg);
-}
-
-.ribbon-tie::after {
-  box-sizing: content-box;
-  left: auto;
-  right: -7rem;
-  border-left: 20px solid var(--ribbon-tie-shadow); /*sh*/
-  border-right: 30px solid transparent;
-  transform: rotate(5deg);
-}
-
 .ribbon-tie {
-  color: var(--ribbon-tie-color); /*cl*/
-  background: var(--ribbon-tie-background); /*bg*/
+  color: var(--ribbon-tie-color);
+  background: var(--ribbon-tie-background);
 }
 
 /* ribbon-lose */
-.ribbon-lose::before,
-.ribbon-lose::after {
-  box-sizing: content-box;
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: -7rem;
-  top: 2rem;
-  width: 4rem;
-  border: 30px solid var(--ribbon-lose-background); /*bg*/
-  border-right: 20px solid var(--ribbon-lose-shadow); /*sh*/
-  border-left-color: transparent;
-  transform: rotate(-5deg);
-}
-
-.ribbon-lose::after {
-  box-sizing: content-box;
-  left: auto;
-  right: -7rem;
-  border-left: 20px solid var(--ribbon-lose-shadow); /*sh*/
-  border-right: 30px solid transparent;
-  transform: rotate(5deg);
-}
-
 .ribbon-lose {
-  color: var(--ribbon-lose-color); /*cl*/
-  background: var(--ribbon-lose-background); /*bg*/
+  color: var(--ribbon-lose-color);
+  background: var(--ribbon-lose-background);
 }
 
 /**********
@@ -304,7 +245,9 @@ controls
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: calc((var(--card-size) / -3));
 }
+
 .game-btn {
   margin: 0rem 0.5rem;
   padding: 2rem 0.5rem;
@@ -321,7 +264,6 @@ controls
 }
 
 .game-btn:hover,
-.game-btn:focus,
 #double-btn:hover {
   background-color: #0060ff;
   box-shadow: 0px 0px 1.5rem #fff;
@@ -337,10 +279,18 @@ controls
   color: #fff;
   background-color: #0075ff;
   box-shadow: 0px 0px 20px 5px #355;
+  margin-right: 2rem;
 }
 
 #bet-btn {
   width: 8rem;
+}
+
+#bet-mid #currency-sign {
+  display: inline-block;
+  font-size: 3rem;
+  margin-left: 3rem;
+  width: 7rem;
 }
 
 #allin-btn:hover {
@@ -361,12 +311,9 @@ controls bank section
   margin-bottom: 2rem;
 }
 
-.fixed-bottom {
+#fixed-bottom {
   position: fixed !important;
-  /* background-color: var(--transparent-background) !important; */
-  /* box-shadow: 0px 0px 20px 5px rgba(47, 79, 79, 0.75) !important; */
   bottom: 0 !important;
-  /* width: calc(100% - var(--game-container-margin) * 2) !important; */
   width: 100%;
 }
 
