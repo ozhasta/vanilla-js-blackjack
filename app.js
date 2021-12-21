@@ -27,6 +27,8 @@ let bankBalance = 1000
 let currentBet = 0
 let bankBalanceRestorePoint
 
+let poppedCard
+
 // >>> Setting variables
 const playBtnEl = document.querySelector("#play-btn")
 const playerNameInputEl = document.querySelector("#player-name-input")
@@ -118,9 +120,9 @@ clearBetBtnEl.addEventListener("click", () => {
   firstBetEl.textContent = currentBet
   bankBalance = bankBalanceRestorePoint
   bankBalanceEl.textContent = bankBalanceRestorePoint
-
   checkBalanceForButtons()
 })
+
 allinBtnEl.addEventListener("click", () => {
   currentBet += bankBalance
   firstBetEl.textContent = currentBet
@@ -142,9 +144,9 @@ const deck = {
   // hearts: ["HK", "H2", "HA", "HK", "H9"],
   // spades: ["HA", "HA", "HA", "HA"],
   // clubs: ["HA", "HA", "HA", "HA"],
-  // // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
+  // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
   // // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
-  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
+  // // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
@@ -160,64 +162,57 @@ function multipleDecks(numOfDeck) {
   // console.log("desteler birlestirildi")
   return multipleDecks
 }
+
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  // for (let i = arr.length - 1; i > 0; i--) {
-  //   let j = Math.floor(Math.random() * (i + 1))
-  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  // }
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
   // console.log("deste karistirildi")
   return arr
 }
 
-function popThenCount() {
-  let poppedCard = currentDeck.pop()
-  let cardFace = poppedCard.slice(-1)
-  let cardVal = 0
+function decideCardValue(currentCard) {
+  let cardFace = currentCard.slice(-1)
   // gecerli kartin dosya isminde bu karakterler var mi, regex
   const face = /(K|Q|J|T)/.test(cardFace) // true or false
-
-  function decideCardValue() {
-    if (cardFace === "A") {
-      /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
-      vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
-      let roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
-      if (roundTotal >= 11) {
-        //  console.log("as 1 sayildi")
-        cardVal = 1
-      } else {
-        //  console.log("as 11 sayildi")
-        cardVal = 11
-      }
-      // gecerli kartin dosya isminde bu karakterler var mi, if ve regex ile test
-    } else if (face) {
-      cardVal = 10
+  if (cardFace === "A") {
+    /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
+    vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
+    let roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
+    if (roundTotal >= 11) {
+      //  console.log("as 1 sayildi")
+      return 1
     } else {
-      cardVal = parseInt(cardFace)
+      //  console.log("as 11 sayildi")
+      return 11
     }
+    // gecerli kartin dosya isminde bu karakterler var mi, if ve regex ile test
+  } else if (face) {
+    return 10
+  } else {
+    return parseInt(cardFace)
   }
+}
+
+function popThenCount() {
+  poppedCard = currentDeck.pop()
 
   if (playersTurn) {
     playerHandEl.innerHTML += `<div class="card"><img src="deck/${poppedCard}.png" /></div>`
-    decideCardValue()
-    playerRoundTotal += cardVal
+
+    playerRoundTotal += decideCardValue(poppedCard)
     playerRoundTotalEl.textContent = playerRoundTotal
-    // oyuncu BJ mi yapti yoksa kagit cekerek mi 21 e ulasti
     if (playerRoundTotal === 21) {
-      if (playerHand.length <= 2) {
-        //buraya dikkat
-        playerBJ()
-      } else {
-        player21()
-      }
+      player21()
     }
     if (playerRoundTotal > 21) {
       playerBust()
     }
   } else {
     dealerHandEl.innerHTML += `<div class="card"><img src="deck/${poppedCard}.png" /></div>`
-    decideCardValue()
-    dealerRoundTotal += cardVal
+    dealerRoundTotal += decideCardValue(poppedCard)
     dealerRoundTotalEl.textContent = dealerRoundTotal
   }
   remainingCardsCounterEl.textContent = currentDeck.length
@@ -227,6 +222,7 @@ function popThenCount() {
 const hitBtnEl = document.querySelector("#hit-btn")
 hitBtnEl.addEventListener("click", insertPlayerCardToDOM)
 function insertPlayerCardToDOM() {
+  playersTurn = true
   doubleBtnEl.disabled = true
   playerHand.push(popThenCount())
 }
@@ -285,13 +281,6 @@ function dealerBust() {
   handlePayment("win")
 }
 
-function playerBJ() {
-  playerHasBJ = true
-  disableRoundButtons()
-  insertDealerCardToDOM()
-  //  console.log("oyuncu elden BlackJack yapti")
-}
-
 function player21() {
   disableRoundButtons()
   insertDealerCardToDOM()
@@ -340,36 +329,31 @@ function startRound() {
   //  console.log("kagitlar dagitildi")
   dealerHand.push(popThenCount())
   dealerHand.push(popThenCount())
-  console.log("dealerHand.length", dealerHand.length)
-
-  if (dealerRoundTotal === 21) {
-    dealerHasBJ = true
-  }
 
   playersTurn = true
   playerHand.push(popThenCount())
   playerHand.push(popThenCount())
-  console.log("playerHand.length", playerHand.length)
 }
 
 function decideWinner() {
-  console.log("#####")
-  console.log("dl", dealerHand.length)
-  console.log("pl", playerHand.length)
-  console.log("#####")
-  if (playerRoundTotal > dealerRoundTotal) {
-    playerWinRibbon()
-    handlePayment("win")
-  } else if (playerRoundTotal < dealerRoundTotal) {
-    dealerWinRibbon()
-    resetRound()
-  } else if (playerRoundTotal === dealerRoundTotal) {
+  //bug :( playerHand.length === 1
+  if (playerRoundTotal === 21 && playerHand.length === 1) {
+    console.log("player bj")
+    playerHasBJ = true
+  }
+  if (dealerRoundTotal === 21 && dealerHand.length < 3) {
+    console.log("dealer bj")
+    dealerHasBJ = true
+  }
+
+  if (playerRoundTotal === dealerRoundTotal) {
     if (playerHasBJ && !dealerHasBJ) {
+      console.log("playerHasBJ", playerHasBJ)
       console.log("player blackjack win")
       handlePayment("bj")
       playerWinRibbon()
     } else if (dealerHasBJ && !playerHasBJ) {
-      console.log(playerHasBJ)
+      console.log("dealerHasBJ", dealerHasBJ)
       console.log("dealer blackjack win")
       dealerWinRibbon()
       resetRound()
@@ -377,6 +361,13 @@ function decideWinner() {
       tieRibbon()
       handlePayment("tie")
     }
+  }
+  if (playerRoundTotal > dealerRoundTotal) {
+    playerWinRibbon()
+    handlePayment("win")
+  } else if (playerRoundTotal < dealerRoundTotal) {
+    dealerWinRibbon()
+    resetRound()
   }
 }
 
