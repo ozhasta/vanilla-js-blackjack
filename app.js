@@ -26,8 +26,8 @@ let playersTurn = false
 let bankBalance = 1000
 let currentBet = 0
 let bankBalanceRestorePoint
-
-let poppedCard
+let dealerHiddenCardValue = 0
+let lastCard
 
 // >>> Setting variables
 const playBtnEl = document.querySelector("#play-btn")
@@ -176,7 +176,7 @@ function shuffle() {
 function decideCardValue(currentCard) {
   let cardFace = currentCard.slice(-1)
   // gecerli kartin dosya isminde bu karakterler var mi, regex
-  const face = /(K|Q|J|T)/.test(cardFace) // true or false
+  const KQJT = /(K|Q|J|T)/.test(cardFace) // true or false
   if (cardFace === "A") {
     /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
     vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
@@ -189,20 +189,20 @@ function decideCardValue(currentCard) {
       return 11
     }
     // gecerli kartin dosya isminde bu karakterler var mi, if ve regex ile test
-  } else if (face) {
+  } else if (KQJT) {
     return 10
   } else {
     return parseInt(cardFace)
   }
 }
 
-function popThenCount() {
-  poppedCard = currentDeck.pop()
+function drawACard() {
+  lastCard = currentDeck.pop()
 
   if (playersTurn) {
-    playerHandEl.innerHTML += `<div class="card"><img src="deck/${poppedCard}.png" /></div>`
+    playerHandEl.innerHTML += `<div class="card"><img src="deck/${lastCard}.png" /></div>`
 
-    playerRoundTotal += decideCardValue(poppedCard)
+    playerRoundTotal += decideCardValue(lastCard)
     playerRoundTotalEl.textContent = playerRoundTotal
     if (playerRoundTotal === 21) {
       player21()
@@ -211,12 +211,19 @@ function popThenCount() {
       playerBust()
     }
   } else {
-    dealerHandEl.innerHTML += `<div class="card"><img src="deck/${poppedCard}.png" /></div>`
-    dealerRoundTotal += decideCardValue(poppedCard)
-    dealerRoundTotalEl.textContent = dealerRoundTotal
+    if (dealerHand.length === 0) {
+      dealerHandEl.innerHTML += `<div class="card">
+          <img id="hiddenCardBack" src="others/${deckColorInput}_back.png" />
+          <img src="deck/${lastCard}.png" /></div>`
+      dealerHiddenCardValue = decideCardValue(lastCard)
+    } else {
+      dealerHandEl.innerHTML += `<div class="card"><img src="deck/${lastCard}.png" /></div>`
+      dealerRoundTotal += decideCardValue(lastCard)
+      dealerRoundTotalEl.textContent = dealerRoundTotal
+    }
   }
   remainingCardsCounterEl.textContent = currentDeck.length
-  return poppedCard
+  return lastCard
 }
 
 const hitBtnEl = document.querySelector("#hit-btn")
@@ -224,13 +231,13 @@ hitBtnEl.addEventListener("click", insertPlayerCardToDOM)
 function insertPlayerCardToDOM() {
   playersTurn = true
   doubleBtnEl.disabled = true
-  playerHand.push(popThenCount())
+  playerHand.push(drawACard())
 }
 
 function insertDealerCardToDOM() {
   playersTurn = false
   while (dealerRoundTotal < 17) {
-    dealerHand.push(popThenCount())
+    dealerHand.push(drawACard())
     if (dealerRoundTotal > 21) {
       return dealerBust()
     }
@@ -242,7 +249,19 @@ const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
   disableRoundButtons()
-  insertDealerCardToDOM()
+  dealerRoundTotal += dealerHiddenCardValue
+  dealerRoundTotalEl.textContent = dealerRoundTotal
+  const hiddenCardBackEl = document.querySelector("#hiddenCardBack")
+  hiddenCardBackEl.classList.toggle("reveal")
+
+  sleep(2000).then(() => {
+    hiddenCardBackEl.remove()
+    insertDealerCardToDOM()
+  })
+
+  // setTimeout(function () {
+  // }, 2000)
+
   // console.log("oyuncu kalkti")
 }
 
@@ -262,6 +281,17 @@ function double() {
   }
 }
 
+function player21() {
+  disableRoundButtons()
+  dealerRoundTotal += dealerHiddenCardValue
+  dealerRoundTotalEl.textContent = dealerRoundTotal
+  insertDealerCardToDOM()
+  // console.log("oyuncu 21 e ulasti")
+}
+
+/****************
+ribbon management
+*****************/
 function playerBust() {
   disableRoundButtons()
   playerRibbonEl.textContent = "Bust"
@@ -270,26 +300,14 @@ function playerBust() {
   // console.log("oyuncu patladi")
   resetRound()
 }
-
 function dealerBust() {
   dealerRibbonEl.textContent = "Bust"
-  dealerRibbonEl.classList.toggle("ribbon")
   dealerRibbonEl.classList.toggle("ribbon-lose")
-  dealerRibbonEl.classList.toggle("hidden")
+  toggleDealerRibbon()
   playerWinRibbon()
   // console.log("dealer patladi")
   handlePayment("win")
 }
-
-function player21() {
-  disableRoundButtons()
-  insertDealerCardToDOM()
-  // console.log("oyuncu 21 e ulasti")
-}
-
-/****************
-ribbon management
-*****************/
 function togglePlayerRibbon() {
   playerRibbonEl.classList.toggle("ribbon")
   playerRibbonEl.classList.toggle("hidden")
@@ -327,22 +345,21 @@ function startRound() {
     currentDeck.push(...shuffle())
   }
   //  console.log("kagitlar dagitildi")
-  dealerHand.push(popThenCount())
-  dealerHand.push(popThenCount())
+  dealerHand.push(drawACard())
+  dealerHand.push(drawACard())
 
   playersTurn = true
-  playerHand.push(popThenCount())
-  playerHand.push(popThenCount())
+  playerHand.push(drawACard())
+  playerHand.push(drawACard())
 }
 
 function decideWinner() {
   //bug :( playerHand.length === 1
   if (playerRoundTotal === 21 && playerHand.length === 1) {
-    console.log("player bj")
     playerHasBJ = true
   }
-  if (dealerRoundTotal === 21 && dealerHand.length < 3) {
-    console.log("dealer bj")
+  if (dealerRoundTotal === 21 && dealerHand.length === 2) {
+    // < 3 ?
     dealerHasBJ = true
   }
 
@@ -383,14 +400,15 @@ function resetRoundButtons() {
 }
 
 function resetRound() {
-  document.getElementById("splash-screen").classList.toggle("hidden") // buraya dikkat
-  setTimeout(function () {
+  bankBalanceRestorePoint = bankBalance
+  document.getElementById("splash-screen").classList.toggle("hidden")
+  sleep(5000).then(() => {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("round-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
     document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
     document.getElementById("fixed-bottom-round").classList.toggle("hidden")
-    document.getElementById("splash-screen").classList.toggle("hidden") // buraya dikkat
+    document.getElementById("splash-screen").classList.toggle("hidden")
     playersTurn = false
     dealerHand.length = 0
     dealerHandEl.innerHTML = `<div class="cards"></div>`
@@ -408,7 +426,10 @@ function resetRound() {
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
     resetRoundButtons()
-  }, 6000)
+  })
+
+  // setTimeout(function () {
+  // }, 5000)
 }
 /****************
 computing balance
@@ -432,4 +453,11 @@ function handlePayment(status) {
       break
   }
   resetRound()
+}
+
+/****************
+helper function
+*****************/
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
