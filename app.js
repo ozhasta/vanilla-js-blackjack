@@ -34,28 +34,34 @@ const playBtnEl = document.querySelector("#play-btn")
 const playerNameInputEl = document.querySelector("#player-name-input")
 let numberOfDecksInput = 4
 let deckUsegeRatioInput = 100
-let deckColorInput = "blue"
+let deckColorInput
 let playerName = "Player"
 // Setting variables <<<
 
 /****************
 settings section
 *****************/
+const hiddenCardBackImg = document.createElement("img")
+hiddenCardBackImg.id = "hiddenCardBack"
+
 playBtnEl.addEventListener("click", saveSettings)
 function saveSettings() {
   numberOfDecksInput = document.getElementById("numberOfDecksInput").value
-  const deckUsegeRatioInputElement = document.getElementsByName("prevent-card-counting")
-  deckUsegeRatioInputElement.forEach((item) => {
+  const deckUsegeRatioInputEl = document.getElementsByName("prevent-card-counting")
+  deckUsegeRatioInputEl.forEach((item) => {
     if (item.checked) {
       deckUsegeRatioInput = item.value
     }
   })
-  const deckColorInputElement = document.getElementsByName("deck-color")
-  deckColorInputElement.forEach((item) => {
+  const deckColorInputEl = document.getElementsByName("deck-color")
+  deckColorInputEl.forEach((item) => {
     if (item.checked) {
       deckColorInput = item.value
     }
   })
+
+  hiddenCardBackImg.src = `others/${deckColorInput}_back.png`
+
   playerName = playerNameInputEl.value
   playerNameOutputEl.textContent = playerName
 
@@ -80,12 +86,12 @@ function betting() {
     if (currentBet === 0) {
       return
     }
+    roundBetEl.textContent = currentBet
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("round-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
     document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
     document.getElementById("fixed-bottom-round").classList.toggle("hidden")
-    roundBetEl.textContent = currentBet
     startRound()
   })
 }
@@ -198,10 +204,14 @@ function decideCardValue(currentCard) {
 
 function drawACard() {
   lastCard = currentDeck.pop()
+  const cardDiv = document.createElement("div")
+  cardDiv.classList.add("card")
+  const cardImg = document.createElement("img")
+  cardImg.src = `deck/${lastCard}.png`
+  cardDiv.append(cardImg)
 
   if (playersTurn) {
-    playerHandEl.innerHTML += `<div class="card"><img src="deck/${lastCard}.png" /></div>`
-
+    playerHandEl.append(cardDiv)
     playerRoundTotal += decideCardValue(lastCard)
     playerRoundTotalEl.textContent = playerRoundTotal
     if (playerRoundTotal === 21) {
@@ -212,12 +222,11 @@ function drawACard() {
     }
   } else {
     if (dealerHand.length === 0) {
-      dealerHandEl.innerHTML += `<div class="card">
-          <img id="hiddenCardBack" src="others/${deckColorInput}_back.png" />
-          <img src="deck/${lastCard}.png" /></div>`
+      cardDiv.append(hiddenCardBackImg)
+      dealerHandEl.append(cardDiv)
       dealerHiddenCardValue = decideCardValue(lastCard)
     } else {
-      dealerHandEl.innerHTML += `<div class="card"><img src="deck/${lastCard}.png" /></div>`
+      dealerHandEl.append(cardDiv)
       dealerRoundTotal += decideCardValue(lastCard)
       dealerRoundTotalEl.textContent = dealerRoundTotal
     }
@@ -235,33 +244,30 @@ function insertPlayerCardToDOM() {
 }
 
 function insertDealerCardToDOM() {
-  playersTurn = false
-  while (dealerRoundTotal < 17) {
-    dealerHand.push(drawACard())
-    if (dealerRoundTotal > 21) {
-      return dealerBust()
+  dealerRoundTotal += dealerHiddenCardValue
+  dealerRoundTotalEl.textContent = dealerRoundTotal
+  hiddenCardBackImg.classList.toggle("reveal")
+
+  sleep(2000).then(() => {
+    hiddenCardBackImg.remove()
+    playersTurn = false
+    while (dealerRoundTotal < 17) {
+      dealerHand.push(drawACard())
+      if (dealerRoundTotal > 21) {
+        return dealerBust()
+      }
     }
-  }
-  decideWinner()
+    decideWinner()
+  })
 }
 
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
-  disableRoundButtons()
-  dealerRoundTotal += dealerHiddenCardValue
-  dealerRoundTotalEl.textContent = dealerRoundTotal
-  const hiddenCardBackEl = document.querySelector("#hiddenCardBack")
-  hiddenCardBackEl.classList.toggle("reveal")
-
-  sleep(2000).then(() => {
-    hiddenCardBackEl.remove()
-    insertDealerCardToDOM()
-  })
-
+  toggleRoundButtons()
+  insertDealerCardToDOM()
   // setTimeout(function () {
   // }, 2000)
-
   // console.log("oyuncu kalkti")
 }
 
@@ -274,17 +280,14 @@ function double() {
     bankBalanceEl.textContent = bankBalance
     currentBet = currentBet * 2
     roundBetEl.textContent = currentBet
-
-    disableRoundButtons()
+    toggleRoundButtons()
     insertPlayerCardToDOM()
     insertDealerCardToDOM()
   }
 }
 
 function player21() {
-  disableRoundButtons()
-  dealerRoundTotal += dealerHiddenCardValue
-  dealerRoundTotalEl.textContent = dealerRoundTotal
+  toggleRoundButtons()
   insertDealerCardToDOM()
   // console.log("oyuncu 21 e ulasti")
 }
@@ -293,7 +296,7 @@ function player21() {
 ribbon management
 *****************/
 function playerBust() {
-  disableRoundButtons()
+  toggleRoundButtons()
   playerRibbonEl.textContent = "Bust"
   playerRibbonEl.classList.toggle("ribbon-lose")
   togglePlayerRibbon()
@@ -359,7 +362,6 @@ function decideWinner() {
     playerHasBJ = true
   }
   if (dealerRoundTotal === 21 && dealerHand.length === 2) {
-    // < 3 ?
     dealerHasBJ = true
   }
 
@@ -388,16 +390,22 @@ function decideWinner() {
   }
 }
 
-function disableRoundButtons() {
-  hitBtnEl.disabled = true
-  standBtnEl.disabled = true
-  doubleBtnEl.disabled = true
+function toggleRoundButtons() {
+  hitBtnEl.disabled = !hitBtnEl.disabled
+  standBtnEl.disabled = !standBtnEl.disabled
+  doubleBtnEl.disabled = !doubleBtnEl.disabled
 }
-function resetRoundButtons() {
-  hitBtnEl.disabled = false
-  standBtnEl.disabled = false
-  doubleBtnEl.disabled = false
-}
+
+// function disableRoundButtons() {
+//   hitBtnEl.disabled = true
+//   standBtnEl.disabled = true
+//   doubleBtnEl.disabled = true
+// }
+// function resetRoundButtons() {
+//   hitBtnEl.disabled = false
+//   standBtnEl.disabled = false
+//   doubleBtnEl.disabled = false
+// }
 
 function resetRound() {
   bankBalanceRestorePoint = bankBalance
@@ -411,9 +419,11 @@ function resetRound() {
     document.getElementById("splash-screen").classList.toggle("hidden")
     playersTurn = false
     dealerHand.length = 0
-    dealerHandEl.innerHTML = `<div class="cards"></div>`
+    // dealerHandEl.innerHTML = `<div class="cards"></div>`
+    removeAllChildren(dealerHandEl)
     playerHand.length = 0
-    playerHandEl.innerHTML = `<div class="cards"></div>`
+    // playerHandEl.innerHTML = `<div class="cards"></div>`
+    removeAllChildren(playerHandEl)
     dealerRoundTotal = 0
     dealerRoundTotalEl.textContent = 0
     playerRoundTotal = 0
@@ -425,12 +435,12 @@ function resetRound() {
     // reset ribbon classes
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
-    resetRoundButtons()
+    toggleRoundButtons()
   })
-
   // setTimeout(function () {
   // }, 5000)
 }
+
 /****************
 computing balance
 *****************/
@@ -456,8 +466,14 @@ function handlePayment(status) {
 }
 
 /****************
-helper function
+helper functions
 *****************/
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function removeAllChildren(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild)
+  }
 }
