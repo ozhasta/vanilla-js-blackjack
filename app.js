@@ -215,7 +215,7 @@ function drawACard() {
     playerRoundTotal += decideCardValue(lastCard)
     playerRoundTotalEl.textContent = playerRoundTotal
     if (playerRoundTotal === 21) {
-      player21()
+      stand()
     }
     if (playerRoundTotal > 21) {
       playerBust()
@@ -284,12 +284,6 @@ function double() {
     insertPlayerCardToDOM()
     insertDealerCardToDOM()
   }
-}
-
-function player21() {
-  toggleRoundButtons()
-  insertDealerCardToDOM()
-  // console.log("oyuncu 21 e ulasti")
 }
 
 /****************
