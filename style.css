@@ -1,6 +1,6 @@
 :root {
   --transparent-background: rgba(255, 255, 255, 0.2);
-  --card-size: 25vh;
+  --card-size: 30vh;
 }
 *,
 *::before,
@@ -54,6 +54,26 @@ main {
 .remaining-cards img {
   width: 4rem;
 }
+
+@media screen and (min-width: 1024px) {
+  .balance-move {
+    position: fixed !important;
+    top: 13rem !important;
+    left: 10vw !important;
+    font-size: 3rem !important;
+  }
+  .remaining-cards {
+    position: fixed;
+    font-size: 3rem;
+    top: 2rem;
+    left: 10vw;
+  }
+  .remaining-cards img {
+    width: 5rem;
+    left: 10vw;
+  }
+}
+
 .dealerHand,
 .playerHand {
   position: relative;
@@ -96,7 +116,7 @@ main {
 flip hidden card
 **********/
 .reveal {
-  animation: flippereffect 1s normal forwards;
+  animation: flippereffect 1.7s normal forwards;
 }
 #hiddenCardBack {
   position: absolute;
@@ -273,9 +293,9 @@ controls
   transition: 0.25s background-color ease-out;
   user-select: none;
   width: 46%;
-  max-width: calc(var(--card-size) * 1.8);
+  max-width: 500px;
 }
-
+/* 320px min genislik */
 .game-btn:hover,
 #double-btn:hover {
   background-color: #0060ff;
