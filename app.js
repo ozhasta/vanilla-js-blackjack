@@ -396,17 +396,6 @@ function toggleRoundButtons() {
   doubleBtnEl.disabled = !doubleBtnEl.disabled
 }
 
-// function disableRoundButtons() {
-//   hitBtnEl.disabled = true
-//   standBtnEl.disabled = true
-//   doubleBtnEl.disabled = true
-// }
-// function resetRoundButtons() {
-//   hitBtnEl.disabled = false
-//   standBtnEl.disabled = false
-//   doubleBtnEl.disabled = false
-// }
-
 function resetRound() {
   bankBalanceRestorePoint = bankBalance
   document.getElementById("splash-screen").classList.toggle("hidden")
@@ -432,9 +421,11 @@ function resetRound() {
     firstBetEl.textContent = 0
     dealerHasBJ = false
     playerHasBJ = false
+    hiddenCardBackImg.classList.toggle("reveal")
     // reset ribbon classes
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
+    checkBalanceForButtons()
     toggleRoundButtons()
   })
   // setTimeout(function () {
