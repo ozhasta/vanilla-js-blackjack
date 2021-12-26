@@ -28,7 +28,7 @@
             />
             <output id="output">4</output>
           </div>
-          <div class="settings-section">
+          <section class="settings-section">
             <p>How much of the deck must be dealt before shuffling?</p>
             <p>(Useful for preventing card counting.)</p>
             <input type="radio" id="choice1" name="prevent-card-counting" value="100" />
@@ -37,8 +37,8 @@
             <label for="choice75">75%</label>
             <input type="radio" id="choice3" name="prevent-card-counting" value="50" />
             <label for="choice50">50%</label>
-          </div>
-          <div class="settings-section">
+          </section>
+          <section class="settings-section">
             <p>Which color deck will you play with?</p>
             <div>
               <input type="radio" id="blue" name="deck-color" value="blue" checked />
@@ -65,11 +65,11 @@
               <input type="radio" id="gray" name="deck-color" value="gray" />
               <label for="gray"><img src="others/gray_back.png" /></label>
             </div>
-          </div>
-          <div class="settings-section">
+          </section>
+          <section class="settings-section">
             <p>What is your name?</p>
             <input type="text" id="player-name-input" name="player-name-input" value="Player" />
-          </div>
+          </section>
           <button form="settings" id="play-btn">Play</button>
         </form>
       </div>
@@ -86,6 +86,7 @@
           <span id="currency-sign">$<span id="first-bet">0</span></span>
         </div>
       </div>
+      <!-- <div id="game-over"><button id="restart-btn" class="game-btn">Restart</button>Game Over</div> -->
       <div id="round-container" class="hidden">
         <div class="remaining-cards"><img src="/others/remaining-cards.png" /><br /><span>0</span></div>
         <span class="nick-name">Dealer</span>
@@ -108,7 +109,7 @@
       <!-- end of round-container div-->
       <div id="splash-screen" class="hidden"></div>
       <div id="fixed-bottom">
-        <div id="fixed-bottom-betting" class="hidden">
+        <div id="betting-fixed-bottom" class="hidden">
           <div class="control-chips">
             <button class="chip red">5</button>
             <button class="chip orange">25</button>
@@ -119,7 +120,7 @@
           <button id="clear-btn" class="game-btn">CLEAR BET</button>
           <button id="allin-btn" class="game-btn">ALL IN</button>
         </div>
-        <div id="fixed-bottom-round" class="hidden">
+        <div id="round-fixed-bottom" class="hidden">
           <button id="hit-btn" class="game-btn">Hit</button>
           <button id="stand-btn" class="game-btn">Stand</button>
           <!-- <button id="split" class="game-btn">Split</button> -->

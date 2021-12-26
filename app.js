@@ -71,7 +71,7 @@ function saveSettings() {
   document.getElementById("settings-container").classList.toggle("hidden")
   document.getElementById("betting-container").classList.toggle("hidden")
   document.getElementById("balance").classList.toggle("hidden")
-  document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
+  document.getElementById("betting-fixed-bottom").classList.toggle("hidden")
 
   checkBalanceForButtons()
   betting()
@@ -90,8 +90,8 @@ function betting() {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("round-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
-    document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
-    document.getElementById("fixed-bottom-round").classList.toggle("hidden")
+    document.getElementById("betting-fixed-bottom").classList.toggle("hidden")
+    document.getElementById("round-fixed-bottom").classList.toggle("hidden")
     startRound()
   })
 }
@@ -151,8 +151,8 @@ const deck = {
   // spades: ["HA", "HA", "HA", "HA"],
   // clubs: ["HA", "HA", "HA", "HA"],
   // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
-  // // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
-  // // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
+  // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
+  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
@@ -250,8 +250,26 @@ function insertDealerCardToDOM() {
 
   sleep(2000).then(() => {
     hiddenCardBackImg.remove()
+    if (playerRoundTotal === 21 && playerHand.length === 2) {
+      playerHasBJ = true
+      playerRoundTotalEl.classList.add("bj-glow")
+      playerRoundTotalEl.textContent = "BJ"
+    }
+    if (dealerRoundTotal === 21 && dealerHand.length === 2) {
+      dealerHasBJ = true
+      dealerRoundTotalEl.classList.add("bj-glow")
+      dealerRoundTotalEl.textContent = "BJ"
+    }
+    if (playerHasBJ && !dealerHasBJ) {
+      console.log("playerHasBJ", playerHasBJ)
+      console.log("player blackjack win")
+      handlePayment("bj")
+      playerWinRibbon()
+      return
+    }
     playersTurn = false
     while (dealerRoundTotal < 17) {
+      // console.log("while loop calisti")
       dealerHand.push(drawACard())
       if (dealerRoundTotal > 21) {
         return dealerBust()
@@ -266,24 +284,20 @@ standBtnEl.addEventListener("click", stand)
 function stand() {
   toggleRoundButtons()
   insertDealerCardToDOM()
-  // setTimeout(function () {
-  // }, 2000)
   // console.log("oyuncu kalkti")
 }
 
 const doubleBtnEl = document.querySelector("#double-btn")
 doubleBtnEl.addEventListener("click", double)
 function double() {
-  if (currentBet < bankBalance) {
-    // console.log("oyuncu iki katini istedi")
-    bankBalance = bankBalance - currentBet
-    bankBalanceEl.textContent = bankBalance
-    currentBet = currentBet * 2
-    roundBetEl.textContent = currentBet
-    toggleRoundButtons()
-    insertPlayerCardToDOM()
-    insertDealerCardToDOM()
-  }
+  // console.log("oyuncu iki katini istedi")
+  bankBalance = bankBalance - currentBet
+  bankBalanceEl.textContent = bankBalance
+  currentBet = currentBet * 2
+  roundBetEl.textContent = currentBet
+  toggleRoundButtons()
+  insertPlayerCardToDOM()
+  insertDealerCardToDOM()
 }
 
 /****************
@@ -351,21 +365,8 @@ function startRound() {
 }
 
 function decideWinner() {
-  //bug :( playerHand.length === 1
-  if (playerRoundTotal === 21 && playerHand.length === 1) {
-    playerHasBJ = true
-  }
-  if (dealerRoundTotal === 21 && dealerHand.length === 2) {
-    dealerHasBJ = true
-  }
-
   if (playerRoundTotal === dealerRoundTotal) {
-    if (playerHasBJ && !dealerHasBJ) {
-      console.log("playerHasBJ", playerHasBJ)
-      console.log("player blackjack win")
-      handlePayment("bj")
-      playerWinRibbon()
-    } else if (dealerHasBJ && !playerHasBJ) {
+    if (dealerHasBJ && !playerHasBJ) {
       console.log("dealerHasBJ", dealerHasBJ)
       console.log("dealer blackjack win")
       dealerWinRibbon()
@@ -375,10 +376,10 @@ function decideWinner() {
       handlePayment("tie")
     }
   }
-  if (playerRoundTotal > dealerRoundTotal) {
+  if (playerRoundTotal > dealerRoundTotal && playerRoundTotal <= 21) {
     playerWinRibbon()
     handlePayment("win")
-  } else if (playerRoundTotal < dealerRoundTotal) {
+  } else if (playerRoundTotal < dealerRoundTotal && dealerRoundTotal <= 21) {
     dealerWinRibbon()
     resetRound()
   }
@@ -392,14 +393,14 @@ function toggleRoundButtons() {
 
 function resetRound() {
   bankBalanceRestorePoint = bankBalance
-  document.getElementById("splash-screen").classList.toggle("hidden")
+  document.getElementById("splash-screen").classList.remove("hidden")
   sleep(5000).then(() => {
-    document.getElementById("betting-container").classList.toggle("hidden")
-    document.getElementById("round-container").classList.toggle("hidden")
+    document.getElementById("betting-container").classList.remove("hidden")
+    document.getElementById("betting-fixed-bottom").classList.remove("hidden")
+    document.getElementById("round-container").classList.add("hidden")
+    document.getElementById("round-fixed-bottom").classList.add("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
-    document.getElementById("fixed-bottom-betting").classList.toggle("hidden")
-    document.getElementById("fixed-bottom-round").classList.toggle("hidden")
-    document.getElementById("splash-screen").classList.toggle("hidden")
+    document.getElementById("splash-screen").classList.add("hidden")
     playersTurn = false
     dealerHand.length = 0
     // dealerHandEl.innerHTML = `<div class="cards"></div>`
@@ -412,18 +413,19 @@ function resetRound() {
     playerRoundTotal = 0
     playerRoundTotalEl.textContent = 0
     currentBet = 0
+    dealerHiddenCardValue = 0
     firstBetEl.textContent = 0
     dealerHasBJ = false
     playerHasBJ = false
-    hiddenCardBackImg.classList.toggle("reveal")
+    hiddenCardBackImg.classList.remove("reveal")
+    dealerRoundTotalEl.classList.remove("bj-glow")
+    playerRoundTotalEl.classList.remove("bj-glow")
     // reset ribbon classes
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
     checkBalanceForButtons()
     toggleRoundButtons()
   })
-  // setTimeout(function () {
-  // }, 5000)
 }
 
 /****************

@@ -24,9 +24,32 @@ body {
   font-size: 2rem;
   height: 100vh;
   overflow: hidden;
+  user-select: none;
+
+  /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 300% 500%;
+  animation: gradient 7s ease infinite; */
 }
+
+@keyframes bjgloweffect {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 main {
   padding-top: 2vh;
+}
+@media screen and (min-height: 736px) {
+  main {
+    padding-top: 5vh;
+  }
 }
 
 .hidden {
@@ -41,7 +64,7 @@ main {
 .balance-move {
   position: fixed !important;
   top: 10rem !important;
-  left: 2rem !important;
+  left: 2vw !important;
   font-size: 2rem !important;
   padding-top: 0 !important;
 }
@@ -49,7 +72,7 @@ main {
 .remaining-cards {
   position: fixed;
   top: 2rem;
-  left: 2rem;
+  left: 2vw;
 }
 .remaining-cards img {
   width: 4rem;
@@ -59,18 +82,18 @@ main {
   .balance-move {
     position: fixed !important;
     top: 13rem !important;
-    left: 10vw !important;
+    left: 13vw !important;
     font-size: 3rem !important;
   }
   .remaining-cards {
     position: fixed;
     font-size: 3rem;
     top: 2rem;
-    left: 10vw;
+    left: 13vw;
   }
   .remaining-cards img {
     width: 5rem;
-    left: 10vw;
+    left: 13vw;
   }
 }
 
@@ -99,24 +122,32 @@ main {
   font-size: 3rem;
 }
 .cards {
-  margin-left: calc((var(--card-size) / 2.7));
+  margin-left: calc(var(--card-size) / 2.7);
 }
 .card {
   position: relative;
   display: inline-block;
-  margin-left: calc((var(--card-size) / -2.5));
-  /* animation: dealeffect 1s; */
+  margin-left: calc(var(--card-size) / -2.5);
+  animation: dealeffect 1s;
 }
-/* TODO scale card size based on wievport and maybe chip size? */
 .card img {
   height: var(--card-size);
 }
 
 /**********
-flip hidden card
+blackjack glow
+**********/
+.bj-glow {
+  background: linear-gradient(-60deg, #fff, #ee7752, #e9d201, #d52367, #23d5ab, #000);
+  background-size: 400% 400%;
+  animation: bjgloweffect 1s ease infinite;
+  color: black;
+}
+/**********
+reveal hidden card
 **********/
 .reveal {
-  animation: flippereffect 1.7s normal forwards;
+  animation: revealeffect 1.7s normal forwards;
 }
 #hiddenCardBack {
   position: absolute;
@@ -125,13 +156,20 @@ flip hidden card
 }
 
 .nick-name {
-  margin-right: calc((var(--card-size) / 2.7));
+  margin-right: calc(var(--card-size) / 2.7);
+}
+#game-over {
+  margin: 2rem;
+}
+#game-over > button {
+  margin: 2rem;
+  width: 8rem;
 }
 #splash-screen {
   flex-direction: column;
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0) 25%, rgba(0, 0, 0, 0.8) 75%);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.75) 80%);
   justify-content: center;
   align-items: center;
   color: #fff;
@@ -147,7 +185,7 @@ flip hidden card
   }
 }
 
-@keyframes flippereffect {
+@keyframes revealeffect {
   0% {
     opacity: 1;
   }
@@ -186,7 +224,6 @@ flip hidden card
 /**********
 ribbon
 **********/
-
 .ribbon {
   --ribbon-opacity: 0.9;
   --ribbon-win-color: #451;
@@ -199,7 +236,7 @@ ribbon
   position: absolute;
   margin-right: 4rem;
   margin-top: calc((var(--card-size) / 2) - 2rem);
-  width: calc((var(--card-size) * 1.5));
+  width: calc(var(--card-size) * 1.5);
   font-size: 2.5rem;
   padding: 1rem;
   border-radius: 8px;
@@ -244,7 +281,6 @@ chips
   -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1),
     inset 0 35px 1px var(--transparent-background);
   -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1), inset 0 35px 1px var(--transparent-background);
-  user-select: none;
 }
 .chip:hover {
   color: rgba(255, 255, 255, 1);
@@ -278,7 +314,6 @@ controls
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: calc((var(--card-size) / -3));
 }
 
 .game-btn {
@@ -291,11 +326,10 @@ controls
   background-color: #0075ff;
   box-shadow: 0px 0px 20px 5px #355;
   transition: 0.25s background-color ease-out;
-  user-select: none;
   width: 46%;
-  max-width: 500px;
+  max-width: 380px;
 }
-/* 320px min genislik */
+
 .game-btn:hover,
 #double-btn:hover {
   background-color: #0060ff;
