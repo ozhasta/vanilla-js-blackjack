@@ -86,7 +86,9 @@
           <span id="currency-sign">$<span id="first-bet">0</span></span>
         </div>
       </div>
-      <!-- <div id="game-over"><button id="restart-btn" class="game-btn">Restart</button>Game Over</div> -->
+      <div id="game-over" class="hidden">
+        <button id="restart-btn" class="game-btn" onclick="location.reload();">Restart</button>Game Over
+      </div>
       <div id="round-container" class="hidden">
         <div class="remaining-cards"><img src="/others/remaining-cards.png" /><br /><span>0</span></div>
         <span class="nick-name">Dealer</span>
@@ -111,8 +113,8 @@
       <div id="fixed-bottom">
         <div id="betting-fixed-bottom" class="hidden">
           <div class="control-chips">
-            <button class="chip red">5</button>
-            <button class="chip orange">25</button>
+            <button class="chip red">10</button>
+            <button class="chip orange">50</button>
             <button class="chip lblue">100</button>
             <button class="chip purple">250</button>
             <button class="chip dblue">500</button>

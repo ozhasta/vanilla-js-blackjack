@@ -156,7 +156,7 @@ const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  diamonds: ["H6", "H8", "HK", "H9", "H2", "H7"]
 }
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
@@ -171,17 +171,17 @@ function multipleDecks(numOfDeck) {
 
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
+  // for (let i = arr.length - 1; i > 0; i--) {
+  //   let j = Math.floor(Math.random() * (i + 1))
+  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  // }
   // console.log("deste karistirildi")
   return arr
 }
 
 function decideCardValue(currentCard) {
   let cardFace = currentCard.slice(-1)
-  // gecerli kartin dosya isminde bu karakterler var mi, regex
+  // ozel kartlar, regex
   const KQJT = /(K|Q|J|T)/.test(cardFace) // true or false
   if (cardFace === "A") {
     /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
@@ -194,7 +194,7 @@ function decideCardValue(currentCard) {
       //  console.log("as 11 sayildi")
       return 11
     }
-    // gecerli kartin dosya isminde bu karakterler var mi, if ve regex ile test
+    // gecerli kartin dosya isminde bu karakterler var mi? regex ile test
   } else if (KQJT) {
     return 10
   } else {
@@ -204,6 +204,7 @@ function decideCardValue(currentCard) {
 
 function drawACard() {
   lastCard = currentDeck.pop()
+  remainingCardsCounterEl.textContent = currentDeck.length
   const cardDiv = document.createElement("div")
   cardDiv.classList.add("card")
   const cardImg = document.createElement("img")
@@ -231,7 +232,6 @@ function drawACard() {
       dealerRoundTotalEl.textContent = dealerRoundTotal
     }
   }
-  remainingCardsCounterEl.textContent = currentDeck.length
   return lastCard
 }
 
@@ -243,13 +243,22 @@ function insertPlayerCardToDOM() {
   playerHand.push(drawACard())
 }
 
-function insertDealerCardToDOM() {
+function handleHiddenCard() {
   dealerRoundTotal += dealerHiddenCardValue
   dealerRoundTotalEl.textContent = dealerRoundTotal
-  hiddenCardBackImg.classList.toggle("reveal")
+  if (!hiddenCardBackImg.classList.contains("reveal")) {
+    hiddenCardBackImg.classList.add("reveal")
+  }
+  dealerHiddenCardValue = 0
+}
 
-  sleep(2000).then(() => {
+function insertDealerCardToDOM() {
+  handleHiddenCard()
+  sleep(2500).then(() => {
     hiddenCardBackImg.remove()
+    if (playerRoundTotal > 21) {
+      return
+    }
     if (playerRoundTotal === 21 && playerHand.length === 2) {
       playerHasBJ = true
       playerRoundTotalEl.classList.add("bj-glow")
@@ -272,7 +281,8 @@ function insertDealerCardToDOM() {
       // console.log("while loop calisti")
       dealerHand.push(drawACard())
       if (dealerRoundTotal > 21) {
-        return dealerBust()
+        dealerBust()
+        return
       }
     }
     decideWinner()
@@ -282,7 +292,7 @@ function insertDealerCardToDOM() {
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
-  toggleRoundButtons()
+  disableRoundButtons()
   insertDealerCardToDOM()
   // console.log("oyuncu kalkti")
 }
@@ -295,7 +305,7 @@ function double() {
   bankBalanceEl.textContent = bankBalance
   currentBet = currentBet * 2
   roundBetEl.textContent = currentBet
-  toggleRoundButtons()
+  disableRoundButtons()
   insertPlayerCardToDOM()
   insertDealerCardToDOM()
 }
@@ -304,12 +314,14 @@ function double() {
 ribbon management
 *****************/
 function playerBust() {
-  toggleRoundButtons()
+  disableRoundButtons()
   playerRibbonEl.textContent = "Bust"
   playerRibbonEl.classList.toggle("ribbon-lose")
+  handleHiddenCard()
   togglePlayerRibbon()
   // console.log("oyuncu patladi")
   resetRound()
+  return
 }
 function dealerBust() {
   dealerRibbonEl.textContent = "Bust"
@@ -385,35 +397,37 @@ function decideWinner() {
   }
 }
 
-function toggleRoundButtons() {
-  hitBtnEl.disabled = !hitBtnEl.disabled
-  standBtnEl.disabled = !standBtnEl.disabled
-  doubleBtnEl.disabled = !doubleBtnEl.disabled
+function disableRoundButtons() {
+  hitBtnEl.disabled = true
+  standBtnEl.disabled = true
+  doubleBtnEl.disabled = true
+}
+function enableRoundButtons() {
+  hitBtnEl.disabled = false
+  standBtnEl.disabled = false
+  doubleBtnEl.disabled = false
 }
 
 function resetRound() {
   bankBalanceRestorePoint = bankBalance
   document.getElementById("splash-screen").classList.remove("hidden")
   sleep(5000).then(() => {
-    document.getElementById("betting-container").classList.remove("hidden")
-    document.getElementById("betting-fixed-bottom").classList.remove("hidden")
     document.getElementById("round-container").classList.add("hidden")
     document.getElementById("round-fixed-bottom").classList.add("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
+    document.getElementById("betting-container").classList.remove("hidden")
+    document.getElementById("betting-fixed-bottom").classList.remove("hidden")
     document.getElementById("splash-screen").classList.add("hidden")
     playersTurn = false
     dealerHand.length = 0
-    // dealerHandEl.innerHTML = `<div class="cards"></div>`
     removeAllChildren(dealerHandEl)
     playerHand.length = 0
-    // playerHandEl.innerHTML = `<div class="cards"></div>`
     removeAllChildren(playerHandEl)
     dealerRoundTotal = 0
     dealerRoundTotalEl.textContent = 0
     playerRoundTotal = 0
     playerRoundTotalEl.textContent = 0
     currentBet = 0
-    dealerHiddenCardValue = 0
     firstBetEl.textContent = 0
     dealerHasBJ = false
     playerHasBJ = false
@@ -424,8 +438,21 @@ function resetRound() {
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
     checkBalanceForButtons()
-    toggleRoundButtons()
+    enableRoundButtons()
+    isGameOver()
   })
+}
+
+function isGameOver() {
+  // if banalnce is not enougth for bet then game over :(
+  if (bankBalance === 0 && currentBet === 0 && bankBalanceRestorePoint === 0) {
+    document.getElementById("betting-container").classList.toggle("hidden")
+    document.getElementById("game-over").classList.toggle("hidden")
+    console.log("game over")
+    sleep(10000).then(() => {
+      location.reload()
+    })
+  }
 }
 
 /****************

@@ -25,22 +25,6 @@ body {
   height: 100vh;
   overflow: hidden;
   user-select: none;
-
-  /* background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-  background-size: 300% 500%;
-  animation: gradient 7s ease infinite; */
-}
-
-@keyframes bjgloweffect {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
 main {
@@ -147,7 +131,7 @@ blackjack glow
 reveal hidden card
 **********/
 .reveal {
-  animation: revealeffect 1.7s normal forwards;
+  animation: revealeffect 2.5s normal forwards;
 }
 #hiddenCardBack {
   position: absolute;
@@ -218,6 +202,18 @@ reveal hidden card
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes bjgloweffect {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
@@ -368,10 +364,6 @@ controls
   cursor: not-allowed;
 }
 
-/**********
-controls bank section
-**********/
-
 .control-chips {
   display: flex;
   justify-content: center;
@@ -379,8 +371,8 @@ controls bank section
 }
 
 #fixed-bottom {
-  position: fixed !important;
-  bottom: 0 !important;
+  position: fixed;
+  bottom: 0;
   width: 100%;
 }
 
