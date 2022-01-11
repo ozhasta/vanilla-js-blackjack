@@ -102,6 +102,14 @@ main {
   margin-left: -3.5rem;
 }
 
+#round {
+  padding: 1rem;
+}
+
+#round > button {
+  margin-left: calc(var(--card-size) / -4);
+}
+
 #round span {
   font-size: 3rem;
 }

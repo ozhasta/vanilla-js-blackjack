@@ -23,11 +23,13 @@ let playerHasBJ = false
 let dealerRoundTotal = 0
 let playerRoundTotal = 0
 let playersTurn = false
+let isPlayerBusted = false
 let bankBalance = 1000
 let currentBet = 0
 let bankBalanceRestorePoint
 let dealerHiddenCardValue = 0
 let lastCard
+let doubleBet = false
 
 // >>> Setting variables
 const playBtnEl = document.querySelector("#play-btn")
@@ -147,16 +149,13 @@ game section
   diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
 */
 const deck = {
-  // hearts: ["HK", "H2", "HA", "HK", "H9"],
-  // spades: ["HA", "HA", "HA", "HA"],
-  // clubs: ["HA", "HA", "HA", "HA"],
-  // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
-  // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
-  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["H6", "H8", "HK", "H9", "H2", "H7"]
+  diamonds: ["H6", "H8", "HK", "H9", "H2", "H7"] // dbl test
+  // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
+  // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
+  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
 }
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
@@ -215,7 +214,8 @@ function drawACard() {
     playerHandEl.append(cardDiv)
     playerRoundTotal += decideCardValue(lastCard)
     playerRoundTotalEl.textContent = playerRoundTotal
-    if (playerRoundTotal === 21) {
+    // if player requested double bet, we dont need stand (again)
+    if (playerRoundTotal === 21 && doubleBet === false) {
       stand()
     }
     if (playerRoundTotal > 21) {
@@ -236,8 +236,8 @@ function drawACard() {
 }
 
 const hitBtnEl = document.querySelector("#hit-btn")
-hitBtnEl.addEventListener("click", insertPlayerCardToDOM)
-function insertPlayerCardToDOM() {
+hitBtnEl.addEventListener("click", insertPlayerCard)
+function insertPlayerCard() {
   playersTurn = true
   doubleBtnEl.disabled = true
   playerHand.push(drawACard())
@@ -250,11 +250,12 @@ function handleHiddenCard() {
     hiddenCardBackImg.classList.add("reveal")
   }
   dealerHiddenCardValue = 0
+  console.log("handle hidden card calisti")
 }
 
-function insertDealerCardToDOM() {
+function insertDealerCard() {
   handleHiddenCard()
-  sleep(2500).then(() => {
+  setTimeout(function () {
     hiddenCardBackImg.remove()
     if (playerRoundTotal > 21) {
       return
@@ -286,34 +287,39 @@ function insertDealerCardToDOM() {
       }
     }
     decideWinner()
-  })
+  }, 2500)
 }
 
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
   disableRoundButtons()
-  insertDealerCardToDOM()
+  insertDealerCard()
   // console.log("oyuncu kalkti")
 }
 
 const doubleBtnEl = document.querySelector("#double-btn")
 doubleBtnEl.addEventListener("click", double)
 function double() {
+  doubleBet = true
   // console.log("oyuncu iki katini istedi")
   bankBalance = bankBalance - currentBet
   bankBalanceEl.textContent = bankBalance
   currentBet = currentBet * 2
   roundBetEl.textContent = currentBet
   disableRoundButtons()
-  insertPlayerCardToDOM()
-  insertDealerCardToDOM()
+  insertPlayerCard()
+  // if the dealer not drawn (more then 2) cards then draw for it
+  if (!isPlayerBusted) {
+    insertDealerCard()
+  }
 }
 
 /****************
 ribbon management
 *****************/
 function playerBust() {
+  isPlayerBusted = true
   disableRoundButtons()
   playerRibbonEl.textContent = "Bust"
   playerRibbonEl.classList.toggle("ribbon-lose")
@@ -321,7 +327,6 @@ function playerBust() {
   togglePlayerRibbon()
   // console.log("oyuncu patladi")
   resetRound()
-  return
 }
 function dealerBust() {
   dealerRibbonEl.textContent = "Bust"
@@ -332,12 +337,12 @@ function dealerBust() {
   handlePayment("win")
 }
 function togglePlayerRibbon() {
-  playerRibbonEl.classList.toggle("ribbon")
   playerRibbonEl.classList.toggle("hidden")
+  playerRibbonEl.classList.toggle("ribbon")
 }
 function toggleDealerRibbon() {
-  dealerRibbonEl.classList.toggle("ribbon")
   dealerRibbonEl.classList.toggle("hidden")
+  dealerRibbonEl.classList.toggle("ribbon")
 }
 function playerWinRibbon() {
   playerRibbonEl.textContent = "You win!"
@@ -409,9 +414,10 @@ function enableRoundButtons() {
 }
 
 function resetRound() {
+  doubleBet = false
   bankBalanceRestorePoint = bankBalance
   document.getElementById("splash-screen").classList.remove("hidden")
-  sleep(5000).then(() => {
+  setTimeout(function () {
     document.getElementById("round-container").classList.add("hidden")
     document.getElementById("round-fixed-bottom").classList.add("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
@@ -419,6 +425,7 @@ function resetRound() {
     document.getElementById("betting-fixed-bottom").classList.remove("hidden")
     document.getElementById("splash-screen").classList.add("hidden")
     playersTurn = false
+    isPlayerBusted = false
     dealerHand.length = 0
     removeAllChildren(dealerHandEl)
     playerHand.length = 0
@@ -440,7 +447,7 @@ function resetRound() {
     checkBalanceForButtons()
     enableRoundButtons()
     isGameOver()
-  })
+  }, 5000)
 }
 
 function isGameOver() {
@@ -449,9 +456,9 @@ function isGameOver() {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-over").classList.toggle("hidden")
     console.log("game over")
-    sleep(10000).then(() => {
+    setTimeout(function () {
       location.reload()
-    })
+    }, 9000)
   }
 }
 
@@ -476,15 +483,16 @@ function handlePayment(status) {
       console.log("switch - case hatali")
       break
   }
+  console.log("handle payment calisti")
   resetRound()
 }
 
 /****************
 helper functions
 *****************/
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+// function sleep(ms) {
+//   return new Promise((resolve) => setTimeout(resolve, ms))
+// }
 
 function removeAllChildren(element) {
   while (element.firstChild) {
