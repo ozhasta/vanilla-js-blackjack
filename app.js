@@ -35,7 +35,6 @@ let doubleBet = false
 const playBtnEl = document.querySelector("#play-btn")
 const playerNameInputEl = document.querySelector("#player-name-input")
 let numberOfDecksInput = 4
-let deckUsegeRatioInput = 100
 let deckColorInput
 let playerName = "Player"
 // Setting variables <<<
@@ -49,12 +48,6 @@ hiddenCardBackImg.id = "hiddenCardBack"
 playBtnEl.addEventListener("click", saveSettings)
 function saveSettings() {
   numberOfDecksInput = document.getElementById("numberOfDecksInput").value
-  const deckUsegeRatioInputEl = document.getElementsByName("prevent-card-counting")
-  deckUsegeRatioInputEl.forEach((item) => {
-    if (item.checked) {
-      deckUsegeRatioInput = item.value
-    }
-  })
   const deckColorInputEl = document.getElementsByName("deck-color")
   deckColorInputEl.forEach((item) => {
     if (item.checked) {
@@ -64,7 +57,7 @@ function saveSettings() {
 
   hiddenCardBackImg.src = `others/${deckColorInput}_back.png`
 
-  playerName = playerNameInputEl.value
+  playerName = playerNameInputEl.value.substring(0, 12)
   playerNameOutputEl.textContent = playerName
 
   bankBalanceEl.textContent = bankBalance
@@ -146,16 +139,18 @@ game section
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
+  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+
+  // diamonds: ["H6", "H8", "HK", "H9", "H2", "H7"] // dbl test
+  // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
+  // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
+  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
 */
 const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["H6", "H8", "HK", "H9", "H2", "H7"] // dbl test
-  // diamonds: ["H8", "HK", "HA", "HK", "HA"] // both bj
-  // diamonds: ["H8", "H2", "HA", "HK", "HA"] // dealer bj
-  // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
+  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
 }
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
@@ -170,10 +165,10 @@ function multipleDecks(numOfDeck) {
 
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  // for (let i = arr.length - 1; i > 0; i--) {
-  //   let j = Math.floor(Math.random() * (i + 1))
-  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  // }
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
   // console.log("deste karistirildi")
   return arr
 }
@@ -250,7 +245,7 @@ function handleHiddenCard() {
     hiddenCardBackImg.classList.add("reveal")
   }
   dealerHiddenCardValue = 0
-  console.log("handle hidden card calisti")
+  // console.log("handle hidden card calisti")
 }
 
 function insertDealerCard() {
@@ -309,7 +304,7 @@ function double() {
   roundBetEl.textContent = currentBet
   disableRoundButtons()
   insertPlayerCard()
-  // if the dealer not drawn (more then 2) cards then draw for it
+  // if the dealer NOT drawn (more then 2) cards then draw for it
   if (!isPlayerBusted) {
     insertDealerCard()
   }
@@ -369,7 +364,8 @@ function tieRibbon() {
 function startRound() {
   // if balance is not enougth for doubling bet disable doubleBtn
   doubleBtnEl.disabled = bankBalance < currentBet ? true : false
-  if (currentDeck.length === 0) {
+  if (currentDeck.length < 52) {
+    currentDeck.length = 0
     currentDeck.push(...shuffle())
   }
   //  console.log("kagitlar dagitildi")
@@ -414,7 +410,8 @@ function enableRoundButtons() {
 }
 
 function resetRound() {
-  doubleBet = false
+  // if (currentDeck.length < 26) {
+  // }
   bankBalanceRestorePoint = bankBalance
   document.getElementById("splash-screen").classList.remove("hidden")
   setTimeout(function () {
@@ -426,6 +423,7 @@ function resetRound() {
     document.getElementById("splash-screen").classList.add("hidden")
     playersTurn = false
     isPlayerBusted = false
+    doubleBet = false
     dealerHand.length = 0
     removeAllChildren(dealerHandEl)
     playerHand.length = 0
@@ -483,17 +481,13 @@ function handlePayment(status) {
       console.log("switch - case hatali")
       break
   }
-  console.log("handle payment calisti")
+  // console.log("handle payment calisti")
   resetRound()
 }
 
 /****************
 helper functions
 *****************/
-// function sleep(ms) {
-//   return new Promise((resolve) => setTimeout(resolve, ms))
-// }
-
 function removeAllChildren(element) {
   while (element.firstChild) {
     element.removeChild(element.firstChild)
