@@ -1,6 +1,6 @@
 :root {
   --transparent-background: rgba(255, 255, 255, 0.2);
-  --card-size: 30vh;
+  --card-size: 25vh;
 }
 *,
 *::before,
@@ -101,8 +101,10 @@ main {
   margin-top: -3.5rem;
   margin-left: -3.5rem;
 }
-
 #round {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 1rem;
 }
 
@@ -119,7 +121,7 @@ main {
 .card {
   position: relative;
   display: inline-block;
-  margin-left: calc(var(--card-size) / -2.5);
+  margin-left: calc(var(--card-size) / -2.4);
   animation: dealeffect 1s;
 }
 .card img {
@@ -216,12 +218,16 @@ reveal hidden card
 @keyframes bjgloweffect {
   0% {
     background-position: 0% 50%;
+
+    transform: scale(1.15);
   }
   50% {
     background-position: 100% 50%;
+    transform: scale(0.65);
   }
   100% {
     background-position: 0% 50%;
+    transform: scale(1.15);
   }
 }
 
@@ -314,12 +320,6 @@ chips
 /**********
 controls
 **********/
-#round {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .game-btn {
   margin: 0rem 0.5rem;
   padding: 2rem 0.5rem;

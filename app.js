@@ -23,7 +23,7 @@ let playerHasBJ = false
 let dealerRoundTotal = 0
 let playerRoundTotal = 0
 let playersTurn = false
-let isPlayerBusted = false
+let playerBusted = false
 let bankBalance = 1000
 let currentBet = 0
 let bankBalanceRestorePoint
@@ -147,10 +147,10 @@ game section
   // diamonds: ["H8", "HK", "HA", "H2", "HA"] // player bj
 */
 const deck = {
-  hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
-  spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
-  clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  hearts: ["CA", "CA", "CA", "CA", "CA", "HA"],
+  spades: ["CA", "CA", "CA", "CA", "CA", "SA"],
+  clubs: ["CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"],
+  diamonds: ["CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"]
 }
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
@@ -172,7 +172,7 @@ function shuffle() {
   // console.log("deste karistirildi")
   return arr
 }
-
+let roundTotal
 function decideCardValue(currentCard) {
   let cardFace = currentCard.slice(-1)
   // ozel kartlar, regex
@@ -180,7 +180,7 @@ function decideCardValue(currentCard) {
   if (cardFace === "A") {
     /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
     vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
-    let roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
+    roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
     if (roundTotal >= 11) {
       //  console.log("as 1 sayildi")
       return 1
@@ -288,7 +288,8 @@ function insertDealerCard() {
 const standBtnEl = document.querySelector("#stand-btn")
 standBtnEl.addEventListener("click", stand)
 function stand() {
-  disableRoundButtons()
+  toggleRoundButtons()
+  doubleBtnEl.disabled = true
   insertDealerCard()
   // console.log("oyuncu kalkti")
 }
@@ -302,20 +303,19 @@ function double() {
   bankBalanceEl.textContent = bankBalance
   currentBet = currentBet * 2
   roundBetEl.textContent = currentBet
-  disableRoundButtons()
+  toggleRoundButtons()
   insertPlayerCard()
-  // if the dealer NOT drawn (more then 2) cards then draw for it
-  if (!isPlayerBusted) {
+  if (!playerBusted) {
     insertDealerCard()
   }
 }
-
+//TODO: x2 buton ne durumda kontrol et asagida disable edilmiyor
 /****************
 ribbon management
 *****************/
 function playerBust() {
-  isPlayerBusted = true
-  disableRoundButtons()
+  playerBusted = true
+  toggleRoundButtons()
   playerRibbonEl.textContent = "Bust"
   playerRibbonEl.classList.toggle("ribbon-lose")
   handleHiddenCard()
@@ -398,20 +398,23 @@ function decideWinner() {
   }
 }
 
-function disableRoundButtons() {
-  hitBtnEl.disabled = true
-  standBtnEl.disabled = true
-  doubleBtnEl.disabled = true
-}
-function enableRoundButtons() {
-  hitBtnEl.disabled = false
-  standBtnEl.disabled = false
-  doubleBtnEl.disabled = false
+// function disableRoundButtons() {
+//   hitBtnEl.disabled = true
+//   standBtnEl.disabled = true
+//   doubleBtnEl.disabled = true
+// }
+// function enableRoundButtons() {
+//   hitBtnEl.disabled = false
+//   standBtnEl.disabled = false
+//   doubleBtnEl.disabled = false
+// }
+
+function toggleRoundButtons() {
+  hitBtnEl.disabled = !hitBtnEl.disabled
+  standBtnEl.disabled = !standBtnEl.disabled
 }
 
 function resetRound() {
-  // if (currentDeck.length < 26) {
-  // }
   bankBalanceRestorePoint = bankBalance
   document.getElementById("splash-screen").classList.remove("hidden")
   setTimeout(function () {
@@ -422,7 +425,7 @@ function resetRound() {
     document.getElementById("betting-fixed-bottom").classList.remove("hidden")
     document.getElementById("splash-screen").classList.add("hidden")
     playersTurn = false
-    isPlayerBusted = false
+    playerBusted = false
     doubleBet = false
     dealerHand.length = 0
     removeAllChildren(dealerHandEl)
@@ -443,7 +446,8 @@ function resetRound() {
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
     checkBalanceForButtons()
-    enableRoundButtons()
+    toggleRoundButtons()
+    doubleBtnEl.disabled = false
     isGameOver()
   }, 5000)
 }
