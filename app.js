@@ -18,12 +18,10 @@ const allinBtnEl = document.querySelector("#allin-btn")
 const dealerRibbonEl = document.querySelector("#dealer-msg")
 const playerRibbonEl = document.querySelector("#player-msg")
 const playerNameInputEl = document.querySelector("#player-name-input")
-
 let bankBalance = 1000
 let bankBalanceRestorePoint
 let dealerHiddenCard = null
 let numberOfDecksInput = 4
-
 let dealerHasBJ, dealerHasAce, dealerSoft, playerHasBJ, playerHasAce, playerSoft, playersTurn, playerBusted, currentBet, lastCard, doubleBet
 let dealerRoundTotal, playerRoundTotal
 
@@ -461,7 +459,7 @@ function resetRound() {
 }
 
 function isGameOver() {
-  // if banalnce is not enougth for bet then game over :(
+  // if banalnce is not enough for bet then game over :(
   if (bankBalance === 0 && currentBet === 0 && bankBalanceRestorePoint === 0) {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-over").classList.toggle("hidden")
