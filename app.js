@@ -17,43 +17,49 @@ const clearBetBtnEl = document.querySelector("#clear-btn")
 const allinBtnEl = document.querySelector("#allin-btn")
 const dealerRibbonEl = document.querySelector("#dealer-msg")
 const playerRibbonEl = document.querySelector("#player-msg")
-let dealerHasBJ = false
-let playerHasBJ = false
-let dealerRoundTotal = 0
-let playerRoundTotal = 0
-let playersTurn = false
-let playerBusted = false
+const playerNameInputEl = document.querySelector("#player-name-input")
+
 let bankBalance = 1000
-let currentBet = 0
 let bankBalanceRestorePoint
 let dealerHiddenCard = null
-let lastCard
-let doubleBet = false
-// >>> Setting variables
-const playBtnEl = document.querySelector("#play-btn")
-const playerNameInputEl = document.querySelector("#player-name-input")
 let numberOfDecksInput = 4
-let deckColorInput
-let playerName = "Player"
-// Setting variables <<<
+
+let dealerHasBJ, dealerHasAce, dealerSoft, playerHasBJ, playerHasAce, playerSoft, playersTurn, playerBusted, currentBet, lastCard, doubleBet
+let dealerRoundTotal, playerRoundTotal
+
+function initVariables() {
+  dealerHasBJ = false
+  dealerHasAce = false
+  dealerSoft = true
+  dealerRoundTotal = 0
+  playerHasBJ = false
+  playerHasAce = false
+  playerSoft = true
+  playerRoundTotal = 0
+  playersTurn = false
+  playerBusted = false
+  currentBet = 0
+  lastCard = null
+  doubleBet = false
+}
+initVariables()
 
 /****************
 settings section
 *****************/
 const hiddenCardBackImg = document.createElement("img")
 hiddenCardBackImg.id = "hiddenCardBack"
+const playBtnEl = document.querySelector("#play-btn")
 playBtnEl.addEventListener("click", saveSettings)
 function saveSettings() {
   numberOfDecksInput = document.getElementById("numberOfDecksInput").value
   const deckColorInputEl = document.getElementsByName("deck-color")
   deckColorInputEl.forEach((item) => {
     if (item.checked) {
-      deckColorInput = item.value
+      hiddenCardBackImg.src = `others/${item.value}_back.png`
     }
   })
-  hiddenCardBackImg.src = `others/${deckColorInput}_back.png`
-  playerName = playerNameInputEl.value.substring(0, 12)
-  playerNameOutputEl.textContent = playerName
+  playerNameOutputEl.textContent = playerNameInputEl.value.substring(0, 12)
   bankBalanceEl.textContent = bankBalance
   bankBalanceRestorePoint = bankBalance
   document.getElementById("settings-container").classList.toggle("hidden")
@@ -138,10 +144,10 @@ game section
   // diamonds: ["H8", "HA", "HK", "HA", "H2"] // player bj
 */
 const deck = {
-  hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
-  spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
-  clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  hearts: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
+  spades: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
+  clubs: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
+  diamonds: ["HA", "H5", "H8", "HA", "HA", "H2", "H4", "HA"]
 }
 
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
@@ -157,10 +163,10 @@ function multipleDecks(numOfDeck) {
 
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
+  // for (let i = arr.length - 1; i > 0; i--) {
+  //   let j = Math.floor(Math.random() * (i + 1))
+  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  // }
   // console.log("deste karistirildi")
   return arr
 }
@@ -170,16 +176,7 @@ function decideCardValue(currentCard) {
   // ozel kartlar, regex
   const KQJT = /(K|Q|J|T)/.test(cardFace) // true or false
   if (cardFace === "A") {
-    /* hesaplama yaparken kimin kartlarini saydigini, degisken_(roundTotal)
-    vasitasi ile oyuncu sirasina_(playersTurn) gore belirle */
-    let roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
-    if (roundTotal >= 11) {
-      //  console.log("as 1 sayildi")
-      return 1
-    } else {
-      //  console.log("as 11 sayildi")
-      return 11
-    }
+    return 1
     // gecerli kartin dosya isminde bu karakterler var mi? regex ile test
   } else if (KQJT) {
     return 10
@@ -196,9 +193,20 @@ function drawACard() {
   const cardImg = document.createElement("img")
   cardImg.src = `deck/${lastCard}.png`
   cardDiv.append(cardImg)
+  let cardValue = decideCardValue(lastCard)
+  // if player's turn
   if (playersTurn) {
     playerHandEl.append(cardDiv)
-    playerRoundTotal += decideCardValue(lastCard)
+    if (lastCard.slice(-1) === "A" && !playerHasAce) {
+      playerRoundTotal += 11
+      playerHasAce = true
+    } else if (playerSoft && playerHasAce && playerRoundTotal + cardValue > 21) {
+      playerRoundTotal += cardValue - 10
+      console.log("player -10 calisti")
+      playerSoft = false
+    } else {
+      playerRoundTotal += cardValue
+    }
     playerRoundTotalEl.textContent = playerRoundTotal
     // if player requested double bet, we dont need stand (again)
     if (playerRoundTotal === 21 && !doubleBet) {
@@ -207,17 +215,30 @@ function drawACard() {
     if (playerRoundTotal > 21) {
       playerBust()
     }
-  } else {
+  }
+
+  // if dealer's turn
+  if (!playersTurn) {
     if (dealerHand.length === 0) {
       cardDiv.append(hiddenCardBackImg)
       dealerHandEl.append(cardDiv)
       dealerHiddenCard = lastCard
     } else {
       dealerHandEl.append(cardDiv)
-      dealerRoundTotal += decideCardValue(lastCard)
+      if (lastCard.slice(-1) === "A" && !dealerHasAce) {
+        dealerRoundTotal += 11
+        dealerHasAce = true
+      } else if (dealerSoft && dealerHasAce && dealerRoundTotal + cardValue > 21) {
+        dealerRoundTotal += cardValue - 10
+        console.log("dealer -10 calisti")
+        dealerSoft = false
+      } else {
+        dealerRoundTotal += cardValue
+      }
       dealerRoundTotalEl.textContent = dealerRoundTotal
     }
   }
+
   return lastCard
 }
 
@@ -230,14 +251,19 @@ function insertPlayerCard() {
 }
 
 function handleHiddenCard() {
-  playersTurn = false
-  dealerRoundTotal += decideCardValue(dealerHiddenCard)
+  // playersTurn = false
+  if (dealerHiddenCard.slice(-1) === "A" && !dealerHasAce) {
+    dealerRoundTotal += 11
+    dealerHasAce = true
+  } else {
+    dealerRoundTotal += decideCardValue(dealerHiddenCard)
+  }
   dealerRoundTotalEl.textContent = dealerRoundTotal
   if (!hiddenCardBackImg.classList.contains("reveal")) {
     hiddenCardBackImg.classList.add("reveal")
   }
   dealerHiddenCard = null
-  console.log("handle hidden card calisti")
+  // console.log("handle hidden card calisti")
 }
 
 function insertDealerCard() {
@@ -414,31 +440,24 @@ function resetRound() {
     document.getElementById("betting-container").classList.remove("hidden")
     document.getElementById("betting-fixed-bottom").classList.remove("hidden")
     document.getElementById("splash-screen").classList.add("hidden")
-    playersTurn = false
-    playerBusted = false
-    doubleBet = false
-    dealerHand.length = 0
-    removeAllChildren(dealerHandEl)
-    playerHand.length = 0
-    removeAllChildren(playerHandEl)
-    dealerRoundTotal = 0
-    dealerRoundTotalEl.textContent = 0
-    playerRoundTotal = 0
-    playerRoundTotalEl.textContent = 0
-    currentBet = 0
-    firstBetEl.textContent = 0
-    dealerHasBJ = false
-    playerHasBJ = false
     hiddenCardBackImg.classList.remove("reveal")
     dealerRoundTotalEl.classList.remove("bj-glow")
     playerRoundTotalEl.classList.remove("bj-glow")
     // reset ribbon classes
     dealerRibbonEl.className = "hidden"
     playerRibbonEl.className = "hidden"
+    dealerHand.length = 0
+    dealerRoundTotalEl.textContent = 0
+    playerHand.length = 0
+    playerRoundTotalEl.textContent = 0
+    firstBetEl.textContent = 0
+    removeAllChildren(dealerHandEl)
+    removeAllChildren(playerHandEl)
+    initVariables()
     checkBalanceForButtons()
     enableRoundButtons()
     isGameOver()
-  }, 5000)
+  }, 10000)
 }
 
 function isGameOver() {
