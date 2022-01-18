@@ -142,10 +142,10 @@ game section
   // diamonds: ["H8", "HA", "HK", "HA", "H2"] // player bj
 */
 const deck = {
-  hearts: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
-  spades: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
-  clubs: ["DA", "DA", "DA", "DA", "DA", "DA", "DA", "DA", "DT", "DJ", "DQ", "DK", "DT"],
-  diamonds: ["HA", "H5", "H8", "HA", "HA", "H2", "H4", "HA"]
+  hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
+  spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
+  clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
+  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
 }
 
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
@@ -161,10 +161,10 @@ function multipleDecks(numOfDeck) {
 
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  // for (let i = arr.length - 1; i > 0; i--) {
-  //   let j = Math.floor(Math.random() * (i + 1))
-  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  // }
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
   // console.log("deste karistirildi")
   return arr
 }
@@ -284,8 +284,7 @@ function insertDealerCard() {
     if (playerHasBJ && !dealerHasBJ) {
       console.log("playerHasBJ", playerHasBJ)
       console.log("player blackjack win")
-      handlePayment("bj")
-      playerWinRibbon()
+      handlePayment("bj", "win", "lose")
       return
     }
     playersTurn = false
@@ -324,61 +323,17 @@ function double() {
   }
 }
 
-/****************
-ribbon management
-*****************/
 function playerBust() {
   playerBusted = true
   disableRoundButtons()
-  playerRibbonEl.textContent = "Bust"
-  playerRibbonEl.classList.toggle("ribbon-lose")
   handleHiddenCard()
-  togglePlayerRibbon()
+  handlePayment("lose", "bust", "win")
   // console.log("oyuncu patladi")
-  resetRound()
 }
 
 function dealerBust() {
-  dealerRibbonEl.textContent = "Bust"
-  dealerRibbonEl.classList.toggle("ribbon-lose")
-  toggleDealerRibbon()
-  playerWinRibbon()
+  handlePayment("win", "win", "bust")
   // console.log("dealer patladi")
-  handlePayment("win")
-}
-
-function togglePlayerRibbon() {
-  playerRibbonEl.classList.toggle("hidden")
-  playerRibbonEl.classList.toggle("ribbon")
-}
-
-function toggleDealerRibbon() {
-  dealerRibbonEl.classList.toggle("hidden")
-  dealerRibbonEl.classList.toggle("ribbon")
-}
-
-function playerWinRibbon() {
-  playerRibbonEl.textContent = "You win!"
-  playerRibbonEl.classList.toggle("ribbon-win")
-  togglePlayerRibbon()
-}
-
-function dealerWinRibbon() {
-  dealerRibbonEl.textContent = "Dealer win!"
-  dealerRibbonEl.classList.toggle("ribbon-win")
-  toggleDealerRibbon()
-  playerRibbonEl.textContent = "You lose!"
-  playerRibbonEl.classList.toggle("ribbon-lose")
-  togglePlayerRibbon()
-}
-
-function tieRibbon() {
-  dealerRibbonEl.textContent = "Tie - Push"
-  dealerRibbonEl.classList.toggle("ribbon-tie")
-  toggleDealerRibbon()
-  playerRibbonEl.textContent = "Tie - Push"
-  playerRibbonEl.classList.toggle("ribbon-tie")
-  togglePlayerRibbon()
 }
 
 function startRound() {
@@ -400,19 +355,15 @@ function decideWinner() {
     if (dealerHasBJ && !playerHasBJ) {
       console.log("dealerHasBJ", dealerHasBJ)
       console.log("dealer blackjack win")
-      dealerWinRibbon()
-      resetRound()
+      handlePayment("lose", "lose", "win")
     } else {
-      tieRibbon()
-      handlePayment("tie")
+      handlePayment("tie", "tie", "tie")
     }
   }
   if (playerRoundTotal > dealerRoundTotal && playerRoundTotal <= 21) {
-    playerWinRibbon()
-    handlePayment("win")
+    handlePayment("win", "win", "lose")
   } else if (playerRoundTotal < dealerRoundTotal && dealerRoundTotal <= 21) {
-    dealerWinRibbon()
-    resetRound()
+    handlePayment("lose", "lose", "win")
   }
 }
 
@@ -455,7 +406,7 @@ function resetRound() {
     checkBalanceForButtons()
     enableRoundButtons()
     isGameOver()
-  }, 10000)
+  }, 6000)
 }
 
 function isGameOver() {
@@ -473,26 +424,31 @@ function isGameOver() {
 /****************
 computing balance
 *****************/
-function handlePayment(status) {
-  switch (status) {
+function handlePayment(payment, playerEvent, dealerEvent) {
+  switch (payment) {
     case "tie":
       bankBalance += currentBet
-      bankBalanceEl.textContent = bankBalance
       break
     case "win":
       bankBalance += currentBet * 2
-      bankBalanceEl.textContent = bankBalance
       break
     case "bj":
-      bankBalance += currentBet * 2.5 // BJ pays 3:2
-      bankBalanceEl.textContent = bankBalance
+      bankBalance += currentBet * 2.5 // BJ pays 1.5x
       break
     default:
-      console.log("switch - case hatali")
+      console.log(`switch için değer olarak "${payment}" gönderildi`)
       break
   }
-  // console.log("handle payment calisti")
+
+  playerRibbonEl.textContent = playerEvent === "bust" ? "Bust!" : playerEvent === "tie" ? "Tie - Push!" : `You ${playerEvent}!`
+  playerRibbonEl.classList.add("ribbon", `ribbon-${playerEvent}`)
+  dealerRibbonEl.textContent = dealerEvent === "bust" ? "Bust!" : dealerEvent === "tie" ? "Tie - Push!" : `Dealer ${dealerEvent}!`
+  dealerRibbonEl.classList.add("ribbon", `ribbon-${dealerEvent}`)
+  playerRibbonEl.classList.remove("hidden")
+  dealerRibbonEl.classList.remove("hidden")
+  bankBalanceEl.textContent = bankBalance
   resetRound()
+  // console.log("handle payment calisti")
 }
 
 /****************

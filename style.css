@@ -267,7 +267,8 @@ ribbon
 }
 
 /* ribbon-lose */
-.ribbon-lose {
+.ribbon-lose,
+.ribbon-bust {
   color: var(--ribbon-lose-color);
   background: var(--ribbon-lose-background);
 }
