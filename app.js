@@ -406,7 +406,7 @@ function resetRound() {
     checkBalanceForButtons()
     enableRoundButtons()
     isGameOver()
-  }, 6000)
+  }, 5000)
 }
 
 function isGameOver() {
@@ -435,9 +435,6 @@ function handlePayment(payment, playerEvent, dealerEvent) {
     case "bj":
       bankBalance += currentBet * 2.5 // BJ pays 1.5x
       break
-    default:
-      console.log(`switch için değer olarak "${payment}" gönderildi`)
-      break
   }
 
   playerRibbonEl.textContent = playerEvent === "bust" ? "Bust!" : playerEvent === "tie" ? "Tie - Push!" : `You ${playerEvent}!`
@@ -454,6 +451,7 @@ function handlePayment(payment, playerEvent, dealerEvent) {
 /****************
 helper functions
 *****************/
+// Remove all child elements of element
 function removeAllChildren(element) {
   while (element.firstChild) {
     element.removeChild(element.firstChild)
