@@ -78,11 +78,11 @@ function betting() {
       return
     }
     roundBetEl.textContent = currentBet
+    document.getElementById("round-fixed-bottom").classList.toggle("hidden")
+    document.getElementById("betting-fixed-bottom").classList.toggle("hidden")
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("round-container").classList.toggle("hidden")
     document.getElementById("balance").classList.toggle("balance-move")
-    document.getElementById("betting-fixed-bottom").classList.toggle("hidden")
-    document.getElementById("round-fixed-bottom").classList.toggle("hidden")
     startRound()
   })
 }
@@ -145,7 +145,7 @@ const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  diamonds: ["H8", "HA", "HK", "HA", "HK"] // both bj
 }
 
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
@@ -161,10 +161,10 @@ function multipleDecks(numOfDeck) {
 
 function shuffle() {
   const arr = multipleDecks(numberOfDecksInput)
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
+  // for (let i = arr.length - 1; i > 0; i--) {
+  //   let j = Math.floor(Math.random() * (i + 1))
+  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  // }
   // console.log("deste karistirildi")
   return arr
 }
@@ -259,6 +259,11 @@ function handleHiddenCard() {
   dealerRoundTotalEl.textContent = dealerRoundTotal
   if (!hiddenCardBackImg.classList.contains("reveal")) {
     hiddenCardBackImg.classList.add("reveal")
+    if (dealerRoundTotal === 21 && dealerHand.length === 2) {
+      dealerHasBJ = true
+      dealerRoundTotalEl.classList.add("bj-glow")
+      dealerRoundTotalEl.textContent = "BJ"
+    }
   }
   dealerHiddenCard = null
   // console.log("handle hidden card calisti")
@@ -275,11 +280,6 @@ function insertDealerCard() {
       playerHasBJ = true
       playerRoundTotalEl.classList.add("bj-glow")
       playerRoundTotalEl.textContent = "BJ"
-    }
-    if (dealerRoundTotal === 21 && dealerHand.length === 2) {
-      dealerHasBJ = true
-      dealerRoundTotalEl.classList.add("bj-glow")
-      dealerRoundTotalEl.textContent = "BJ"
     }
     if (playerHasBJ && !dealerHasBJ) {
       console.log("playerHasBJ", playerHasBJ)
@@ -406,7 +406,7 @@ function resetRound() {
     checkBalanceForButtons()
     enableRoundButtons()
     isGameOver()
-  }, 5000)
+  }, 6000)
 }
 
 function isGameOver() {

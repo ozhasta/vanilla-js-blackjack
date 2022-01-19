@@ -28,11 +28,11 @@ body {
 }
 
 main {
-  padding-top: 2vh;
+  padding-top: 5vh;
 }
 @media screen and (min-height: 736px) {
   main {
-    padding-top: 5vh;
+    padding-top: 7vh;
   }
 }
 
@@ -190,16 +190,10 @@ reveal hidden card
 
 @keyframes dealeffect {
   0% {
-    transform: translateY(-15rem) translateX(35rem) scale(0);
+    transform: translateY(-70vh) scale(0);
   }
-  /* 33% {
-    transform: translateY(-15rem) translateX(15rem);
-  }
-  66% {
-    transform: translateY(-10rem) translateX(10rem);
-  } */
   100% {
-    transform: translateY(0rem) translatex(0rem) scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -238,7 +232,7 @@ ribbon
   --ribbon-opacity: 0.9;
   --ribbon-win-color: #451;
   --ribbon-win-background: rgba(154, 187, 34, var(--ribbon-opacity));
-  --ribbon-tie-color: #444;
+  --ribbon-tie-color: #333;
   --ribbon-tie-background: rgba(153, 153, 153, var(--ribbon-opacity));
   --ribbon-lose-color: #5e0b0c;
   --ribbon-lose-background: rgba(211, 58, 83, var(--ribbon-opacity));

@@ -15,7 +15,7 @@
         <!-- start of settings-container div -->
         <form name="settings" onSubmit="return false;">
           <div class="settings-section">
-            <p>How many decks do you want to play with?</p>
+            <p>Choose the number of decks:</p>
             <input
               type="range"
               id="numberOfDecksInput"
@@ -28,31 +28,31 @@
             <output id="output">4</output>
           </div>
           <section class="settings-section">
-            <p>Which color deck will you play with?</p>
+            <p>Choose deck color:</p>
             <div>
               <input type="radio" id="blue" name="deck-color" value="blue" checked />
-              <label for="blue"><img src="others/blue_back.png" /></label>
+              <label for="blue"><img src="others/blue_back_mini.png" /></label>
             </div>
             <div>
               <input type="radio" id="red" name="deck-color" value="red" />
-              <label for="red"><img src="others/red_back.png" /></label>
+              <label for="red"><img src="others/red_back_mini.png" /></label>
             </div>
             <div>
               <input type="radio" id="green" name="deck-color" value="green" />
-              <label for="green"><img src="others/green_back.png" /></label>
+              <label for="green"><img src="others/green_back_mini.png" /></label>
             </div>
             <br />
             <div>
               <input type="radio" id="yellow" name="deck-color" value="yellow" />
-              <label for="yellow"><img src="others/yellow_back.png" /></label>
+              <label for="yellow"><img src="others/yellow_back_mini.png" /></label>
             </div>
             <div>
               <input type="radio" id="purple" name="deck-color" value="purple" />
-              <label for="purple"><img src="others/purple_back.png" /></label>
+              <label for="purple"><img src="others/purple_back_mini.png" /></label>
             </div>
             <div>
               <input type="radio" id="gray" name="deck-color" value="gray" />
-              <label for="gray"><img src="others/gray_back.png" /></label>
+              <label for="gray"><img src="others/gray_back_mini.png" /></label>
             </div>
           </section>
           <section class="settings-section">
@@ -63,12 +63,10 @@
         </form>
       </div>
       <!-- end of settings-container div -->
-      <!-- start of round-container div -->
       <div id="balance" class="hidden">
         <div>Bank</div>
         <span>$<span id="bank-balance">0</span></span>
       </div>
-
       <div id="betting-container" class="hidden">
         <div id="bet-mid">
           <button id="bet-btn" class="game-btn">BET</button>
@@ -78,6 +76,7 @@
       <div id="game-over" class="hidden">
         <button id="restart-btn" class="game-btn" onclick="location.reload();">Restart</button>Game Over
       </div>
+      <!-- start of round-container div -->
       <div id="round-container" class="hidden">
         <div class="remaining-cards"><img src="others/remaining-cards.png" /><br /><span>0</span></div>
         <span class="nick-name">Dealer</span>
@@ -97,7 +96,7 @@
         </div>
         <span id="player-name-output" class="nick-name">Player</span>
       </div>
-      <!-- end of round-container div-->
+      <!-- end of round-container div -->
       <div id="splash-screen" class="hidden"></div>
       <div id="fixed-bottom">
         <div id="betting-fixed-bottom" class="hidden">
