@@ -2,6 +2,7 @@
 # BlackJack game
 ## Written in vanilla JavaScript, HTML, CSS. 
 All the rules of the game have been applied (some of rules complicated) and are in working condition. (According myself :) )
+I implemented a few CSS animations for better visuals & feels.
 
 Due to the weakness of the JavaScript built-in random generator, during development I found different shuffling algorithm that working much better, and that's the *only part I've used code from the outside* (internet). See, below.
 
