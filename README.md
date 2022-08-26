@@ -1,10 +1,28 @@
-
 # BlackJack game
-## Written in vanilla JavaScript, HTML, CSS. 
-All the rules of the game have been applied (some of rules complicated) and are in working condition.
-I implemented a few CSS animations for better visuals & feels.
 
-Due to the weakness of the JavaScript built-in random generator, during development I found different shuffling algorithm that working much better, and that's the *only part I've used code from the outside (internet)*. See, below.
+> Simple BlackJack game, play against dealer.
+
+---
+
+![BlackJack](https://user-images.githubusercontent.com/6636688/186956631-9e4d6c32-845a-4fbd-8392-a3397b1c5a72.png)
+
+---
+
+## Live Demo
+
+Live demo here: :arrow_right: [BlackJack](https://vanilla-js-blackjack.netlify.app/)
+
+## Description
+
+Written in vanilla JavaScript, HTML, CSS. 
+**The special thing about this project for me, is that: I wrote it on my own without reading any other BlackJack code or without watching the tutorial.**
+
+All the necessary rules have been added to the game and are operational.
+I implemented my own CSS animations for better visuals & feels.
+
+## 🙏 Acknowledgments
+
+Fisher–Yates shuffle algorithm: Due to the weakness of the JavaScript built-in random generator, during development I found different shuffling algorithm that working much better, and that's the *only part I've used code from the outside (internet)*. See, below.
 
 
 ```javascript
@@ -14,6 +32,4 @@ Due to the weakness of the JavaScript built-in random generator, during developm
     }
 ```
 
-**The special thing about this project for me, is that: I wrote it on my own without reading any other BlackJack code or without watching the tutorial.**
 
-![bjack](https://user-images.githubusercontent.com/6636688/180058872-33f37d62-3921-4041-8a0d-b9f02a229afa.png)
