@@ -22,7 +22,7 @@ I implemented my own CSS animations for better visuals & feels.
 
 ## 🙏 Acknowledgments
 
-Fisher–Yates shuffle algorithm: Due to the weakness of the JavaScript's built-in shuffling while sorting, during development I found different shuffling algorithm that working much better, and that's the *only part I've used code from the outside (internet)*. See, below.
+Fisher–Yates shuffle algorithm: Due to the weakness of the JavaScript's built-in shuffling while sorting[^1], during development I found different shuffling algorithm that working much better, and that's the *only part I've used code from the outside (internet)*. See, below.
 
 ```javascript
     for (let i = arr.length - 1; i > 0; i--) {
@@ -32,4 +32,4 @@ Fisher–Yates shuffle algorithm: Due to the weakness of the JavaScript's built-
 ```
 
 
-[Compare Naive Swap / Fisher–Yates](https://bost.ocks.org/mike/shuffle/compare.html)
+[^1]: [Compare Naive Swap / Fisher–Yates](https://bost.ocks.org/mike/shuffle/compare.html)
