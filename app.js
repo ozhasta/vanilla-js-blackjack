@@ -14,7 +14,7 @@ const controlChipsEl = document.querySelector(".control-chips")
 const chipBtnsEl = document.querySelectorAll(".control-chips > .chip")
 const roundBetEl = document.querySelector("#round-bet")
 const clearBetBtnEl = document.querySelector("#clear-btn")
-const allinBtnEl = document.querySelector("#allin-btn")
+const allInBtnEl = document.querySelector("#all-in-btn")
 const dealerRibbonEl = document.querySelector("#dealer-msg")
 const playerRibbonEl = document.querySelector("#player-msg")
 const playerNameInputEl = document.querySelector("#player-name-input")
@@ -22,8 +22,19 @@ let bankBalance = 1000
 let bankBalanceRestorePoint
 let dealerHiddenCard = null
 let numberOfDecksInput = 4
-let dealerHasBJ, dealerHasAce, dealerSoft, playerHasBJ, playerHasAce, playerSoft, playersTurn, playerBusted, currentBet, lastCard, doubleBet
-let dealerRoundTotal, playerRoundTotal
+let dealerHasBJ,
+  dealerHasAce,
+  dealerSoft,
+  playerHasBJ,
+  playerHasAce,
+  playerSoft,
+  playersTurn,
+  playerBusted,
+  currentBet,
+  lastCard,
+  doubleBet,
+  dealerRoundTotal,
+  playerRoundTotal
 
 function initVariables() {
   dealerHasBJ = false
@@ -49,6 +60,7 @@ const hiddenCardBackImg = document.createElement("img")
 hiddenCardBackImg.id = "hiddenCardBack"
 const playBtnEl = document.querySelector("#play-btn")
 playBtnEl.addEventListener("click", saveSettings)
+
 function saveSettings() {
   numberOfDecksInput = document.getElementById("numberOfDecksInput").value
   const deckColorInputEl = document.getElementsByName("deck-color")
@@ -77,6 +89,7 @@ function betting() {
     if (currentBet === 0) {
       return
     }
+
     roundBetEl.textContent = currentBet
     document.getElementById("round-fixed-bottom").classList.toggle("hidden")
     document.getElementById("betting-fixed-bottom").classList.toggle("hidden")
@@ -93,10 +106,11 @@ function checkBalanceForButtons() {
     // if target chip's bet value bigger then bankBalance disable that chip
     btn.disabled = Number(btn.textContent) > bankBalance ? true : false
   })
+
   // if current bet equals to 0 then disable clearBet button
   clearBetBtnEl.disabled = currentBet === 0 ? true : false
-  // if bank balance equals to 0 then disable allin button
-  allinBtnEl.disabled = bankBalance === 0 ? true : false
+  // if bank balance equals to 0 then disable all-in button
+  allInBtnEl.disabled = bankBalance === 0 ? true : false
 }
 
 // add event listener to control-chips div
@@ -120,7 +134,7 @@ clearBetBtnEl.addEventListener("click", () => {
   checkBalanceForButtons()
 })
 
-allinBtnEl.addEventListener("click", () => {
+allInBtnEl.addEventListener("click", () => {
   currentBet += bankBalance
   firstBetEl.textContent = currentBet
   bankBalance = 0
@@ -145,16 +159,18 @@ const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"]
+  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
 }
 
 const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
 
 function multipleDecks(numOfDeck) {
   let multipleDecks = []
+
   for (let i = 0; i < numOfDeck; i++) {
     multipleDecks.push(...fullDeck)
   }
+
   // console.log("desteler birlestirildi")
   return multipleDecks
 }
@@ -205,11 +221,13 @@ function drawACard() {
     } else {
       playerRoundTotal += cardValue
     }
+
     playerRoundTotalEl.textContent = playerRoundTotal
-    // if player requested double bet, we dont need stand (again)
+    // if player requested double bet, we don't need stand (again)
     if (playerRoundTotal === 21 && !doubleBet) {
       stand()
     }
+
     if (playerRoundTotal > 21) {
       playerBust()
     }
@@ -228,7 +246,7 @@ function drawACard() {
         dealerHasAce = true
       } else if (dealerSoft && dealerHasAce && dealerRoundTotal + cardValue > 21) {
         dealerRoundTotal += cardValue - 10
-        console.log("dealer -10 calisti")
+        // console.log("dealer -10 calisti")
         dealerSoft = false
       } else {
         dealerRoundTotal += cardValue
@@ -256,6 +274,7 @@ function handleHiddenCard() {
   } else {
     dealerRoundTotal += decideCardValue(dealerHiddenCard)
   }
+
   dealerRoundTotalEl.textContent = dealerRoundTotal
   if (!hiddenCardBackImg.classList.contains("reveal")) {
     hiddenCardBackImg.classList.add("reveal")
@@ -265,6 +284,7 @@ function handleHiddenCard() {
       dealerRoundTotalEl.textContent = "BJ"
     }
   }
+
   dealerHiddenCard = null
   // console.log("handle hidden card calisti")
 }
@@ -276,21 +296,25 @@ function insertDealerCard() {
     if (playerRoundTotal > 21) {
       return
     }
+
     if (playerRoundTotal === 21 && playerHand.length === 2) {
       playerHasBJ = true
       playerRoundTotalEl.classList.add("bj-glow")
       playerRoundTotalEl.textContent = "BJ"
     }
+
     if (playerHasBJ && !dealerHasBJ) {
       console.log("playerHasBJ", playerHasBJ)
       console.log("player blackjack win")
       handlePayment("bj", "win", "lose")
       return
     }
+
     playersTurn = false
     while (dealerRoundTotal < 17) {
       // console.log("while loop calisti")
       dealerHand.push(drawACard())
+
       if (dealerRoundTotal > 21) {
         dealerBust()
         return
@@ -309,6 +333,7 @@ function stand() {
 }
 const doubleBtnEl = document.querySelector("#double-btn")
 doubleBtnEl.addEventListener("click", double)
+
 function double() {
   doubleBet = true
   // console.log("oyuncu iki katini istedi")
@@ -318,6 +343,7 @@ function double() {
   roundBetEl.textContent = currentBet
   disableRoundButtons()
   insertPlayerCard()
+
   if (!playerBusted) {
     insertDealerCard()
   }
@@ -343,6 +369,7 @@ function startRound() {
     currentDeck.length = 0
     currentDeck.push(...shuffle())
   }
+
   //  console.log("kagitlar dagitildi")
   dealerHand.push(drawACard())
   dealerHand.push(drawACard())
@@ -350,6 +377,7 @@ function startRound() {
   playerHand.push(drawACard())
   playerHand.push(drawACard())
 }
+
 function decideWinner() {
   if (playerRoundTotal === dealerRoundTotal) {
     if (dealerHasBJ && !playerHasBJ) {
@@ -410,7 +438,7 @@ function resetRound() {
 }
 
 function isGameOver() {
-  // if banalnce is not enough for bet then game over :(
+  // if balance is not enough for bet then game over :(
   if (bankBalance === 0 && currentBet === 0 && bankBalanceRestorePoint === 0) {
     document.getElementById("betting-container").classList.toggle("hidden")
     document.getElementById("game-over").classList.toggle("hidden")
@@ -437,9 +465,15 @@ function handlePayment(payment, playerEvent, dealerEvent) {
       break
   }
 
-  playerRibbonEl.textContent = playerEvent === "bust" ? "Bust!" : playerEvent === "tie" ? "Tie - Push!" : `You ${playerEvent}!`
+  playerRibbonEl.textContent =
+    playerEvent === "bust" ? "Bust!" : playerEvent === "tie" ? "Tie - Push!" : `You ${playerEvent}!`
   playerRibbonEl.classList.add("ribbon", `ribbon-${playerEvent}`)
-  dealerRibbonEl.textContent = dealerEvent === "bust" ? "Bust!" : dealerEvent === "tie" ? "Tie - Push!" : `Dealer ${dealerEvent}!`
+  dealerRibbonEl.textContent =
+    dealerEvent === "bust"
+      ? "Bust!"
+      : dealerEvent === "tie"
+      ? "Tie - Push!"
+      : `Dealer ${dealerEvent}!`
   dealerRibbonEl.classList.add("ribbon", `ribbon-${dealerEvent}`)
   playerRibbonEl.classList.remove("hidden")
   dealerRibbonEl.classList.remove("hidden")
@@ -451,7 +485,7 @@ function handlePayment(payment, playerEvent, dealerEvent) {
 /****************
 helper functions
 *****************/
-// Remove all child elements of element
+// Remove all the child elements of the element.
 function removeAllChildren(element) {
   while (element.firstChild) {
     element.removeChild(element.firstChild)

@@ -2,6 +2,7 @@
   --transparent-background: rgba(255, 255, 255, 0.2);
   --card-size: 25vh;
 }
+
 *,
 *::before,
 *::after {
@@ -10,9 +11,11 @@
   box-sizing: border-box;
   border: 0;
 }
+
 html {
   font-size: 10px;
 }
+
 body {
   text-align: center;
   color: #fff;
@@ -29,7 +32,8 @@ body {
 main {
   padding-top: 5vh;
 }
-@media screen and (min-height: 736px) {
+
+@media (min-height: 736px) {
   main {
     padding-top: 7vh;
   }
@@ -44,12 +48,13 @@ main {
   font-size: 3.5rem;
   margin-bottom: 4rem;
 }
+
 .balance-move {
-  position: fixed !important;
-  top: 10rem !important;
-  left: 2vw !important;
-  font-size: 2rem !important;
-  padding-top: 0 !important;
+  position: fixed;
+  top: 10rem;
+  left: 2vw;
+  font-size: 2rem;
+  padding-top: 0;
 }
 
 .remaining-cards {
@@ -57,23 +62,26 @@ main {
   top: 2rem;
   left: 2vw;
 }
+
 .remaining-cards img {
   width: 4rem;
 }
 
-@media screen and (min-width: 1024px) {
+@media (min-width: 1024px) {
   .balance-move {
-    position: fixed !important;
-    top: 13rem !important;
-    left: 13vw !important;
-    font-size: 3rem !important;
+    position: fixed;
+    top: 13rem;
+    left: 13vw;
+    font-size: 3rem;
   }
+
   .remaining-cards {
     position: fixed;
     font-size: 3rem;
     top: 2rem;
     left: 13vw;
   }
+
   .remaining-cards img {
     width: 5rem;
     left: 13vw;
@@ -100,6 +108,7 @@ main {
   margin-top: -3.5rem;
   margin-left: -3.5rem;
 }
+
 #round {
   display: flex;
   justify-content: center;
@@ -114,15 +123,18 @@ main {
 #round span {
   font-size: 3rem;
 }
+
 .cards {
   margin-left: calc(var(--card-size) / 2.7);
 }
+
 .card {
   position: relative;
   display: inline-block;
   margin-left: calc(var(--card-size) / -2.4);
-  animation: dealeffect 1s;
+  animation: deal-effect 1s;
 }
+
 .card img {
   height: var(--card-size);
 }
@@ -133,15 +145,17 @@ blackjack glow
 .bj-glow {
   background: linear-gradient(-60deg, #fff, #ee7752, #e9d201, #d52367, #23d5ab, #000);
   background-size: 400% 400%;
-  animation: bjgloweffect 1s ease infinite;
+  animation: glow-effect 1s ease infinite;
   color: black;
 }
+
 /**********
 reveal hidden card
 **********/
 .reveal {
-  animation: revealeffect 2.5s normal forwards;
+  animation: reveal-effect 2.5s normal forwards;
 }
+
 #hiddenCardBack {
   position: absolute;
   top: 0px;
@@ -151,13 +165,16 @@ reveal hidden card
 .nick-name {
   margin-right: calc(var(--card-size) / 2.7);
 }
+
 #game-over {
   margin: 2rem;
 }
+
 #game-over > button {
   margin: 2rem;
   width: 8rem;
 }
+
 #splash-screen {
   flex-direction: column;
   position: fixed;
@@ -167,9 +184,10 @@ reveal hidden card
   align-items: center;
   color: #fff;
   font-size: 4rem;
-  animation: splasheffect 1.5s;
+  animation: splash-effect 1.5s;
 }
-@keyframes splasheffect {
+
+@keyframes splash-effect {
   0% {
     opacity: 0;
   }
@@ -178,7 +196,7 @@ reveal hidden card
   }
 }
 
-@keyframes revealeffect {
+@keyframes reveal-effect {
   0% {
     opacity: 1;
   }
@@ -187,7 +205,7 @@ reveal hidden card
   }
 }
 
-@keyframes dealeffect {
+@keyframes deal-effect {
   0% {
     transform: translateY(-70vh) scale(0);
   }
@@ -196,7 +214,7 @@ reveal hidden card
   }
 }
 
-@keyframes ribboneffect {
+@keyframes ribbon-effect {
   0% {
     transform: scale(0);
   }
@@ -208,7 +226,7 @@ reveal hidden card
   }
 }
 
-@keyframes bjgloweffect {
+@keyframes glow-effect {
   0% {
     background-position: 0% 50%;
 
@@ -244,7 +262,7 @@ ribbon
   padding: 1rem;
   border-radius: 8px;
   opacity: 0.95;
-  animation: ribboneffect 1.5s;
+  animation: ribbon-effect 1.5s;
 }
 
 /* ribbon-win */
@@ -281,30 +299,39 @@ chips
   border-radius: 3.5rem;
   -webkit-border-radius: 3.5rem;
   -moz-border-radius: 3.5rem;
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1), inset 0 35px 1px var(--transparent-background);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1),
+    inset 0 35px 1px var(--transparent-background);
   -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1),
     inset 0 35px 1px var(--transparent-background);
-  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1), inset 0 35px 1px var(--transparent-background);
+  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.1), 0 0 5px 1px rgba(90, 90, 90, 0.1),
+    inset 0 35px 1px var(--transparent-background);
 }
+
 .chip:hover {
   color: rgba(255, 255, 255, 1);
   box-shadow: 0px 0px 1.5rem #fff;
 }
+
 .chip.red {
   background: #ed1f7c;
 }
+
 .chip.orange {
   background: #e67f02;
 }
+
 .chip.lblue {
   background: #2871c9;
 }
+
 .chip.purple {
   background: #7600d6;
 }
+
 .chip.dblue {
   background: #031a36;
 }
+
 .chip:disabled {
   opacity: 0.5;
   text-decoration: line-through;
@@ -358,10 +385,11 @@ controls
   width: 7rem;
 }
 
-#allin-btn:hover {
+#all-in-btn:hover {
   background-color: #ff6347;
 }
-#allin-btn:disabled:hover {
+
+#all-in-btn:disabled:hover {
   background-color: #888;
   cursor: not-allowed;
 }
@@ -384,12 +412,15 @@ settings
 form {
   font-size: 1.7rem;
 }
+
 form p {
   margin-bottom: 0.7em;
 }
+
 form .settings-section {
   margin-bottom: 2.5em;
 }
+
 form .settings-section > div {
   display: inline-block;
   padding-right: 0.5rem;
@@ -406,13 +437,16 @@ form button {
   background-color: #0075ff;
   box-shadow: 0px 0px 30px 20px #355;
 }
+
 form button:hover {
   background-color: #0060ff;
 }
+
 form img {
   width: 3em;
   padding-right: 1em;
 }
+
 #player-name-input {
   padding: 1rem;
   font-weight: bold;
