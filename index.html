@@ -13,17 +13,17 @@
     <main>
       <div id="settings-container">
         <!-- start of settings-container div -->
-        <form name="settings" onSubmit="return false;">
+        <form name="settings">
           <div class="settings-section">
             <p>Choose the number of decks:</p>
             <input
               type="range"
-              id="numberOfDecksInput"
+              id="amountOfDecksInput"
               value="4"
               min="2"
               max="8"
               step="2"
-              oninput="output.value = numberOfDecksInput.value"
+              oninput="output.value = amountOfDecksInput.value"
             />
             <output id="output">4</output>
           </div>
@@ -74,8 +74,8 @@
         </div>
       </div>
       <div id="game-over" class="hidden">
-        <button id="restart-btn" class="game-btn" onclick="location.reload();">Restart</button>Game
-        Over
+        <p>Game Over</p>
+        <button id="restart-btn" class="game-btn">Restart</button>
       </div>
       <!-- start of round-container div -->
       <div id="round-container" class="hidden">
