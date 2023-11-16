@@ -36,7 +36,6 @@ let bankBalanceRestorePoint,
   playersTurn,
   playerBusted,
   currentBet,
-  lastCard,
   doubleBet,
   dealerRoundTotal,
   playerRoundTotal
@@ -55,9 +54,9 @@ function initVariables() {
   playersTurn = false
   playerBusted = false
   currentBet = 0
-  lastCard = null
   doubleBet = false
 }
+
 initVariables()
 
 /****************
@@ -173,25 +172,26 @@ const deck = {
   diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
 }
 
-const fullDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
-
-function generateMultipleDecks(amountOfDecks) {
-  let generateMultipleDecks = []
+function generateCombinedDecks(amountOfDecks) {
+  const completeDeck = [...deck.hearts, ...deck.spades, ...deck.clubs, ...deck.diamonds]
+  const combinedDecks = []
 
   for (let i = 0; i < amountOfDecks; i++) {
-    generateMultipleDecks.push(...fullDeck)
+    combinedDecks.push(...completeDeck)
   }
 
   // console.log("desteler birlestirildi")
-  return generateMultipleDecks
+  return combinedDecks
 }
 
-function shuffle() {
-  const arr = generateMultipleDecks(amountOfDecksInput)
+function shuffleDeck() {
+  const arr = generateCombinedDecks(amountOfDecksInput)
+
   for (let i = arr.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1))
     ;[arr[i], arr[j]] = [arr[j], arr[i]]
   }
+
   // console.log("deste karistirildi")
   return arr
 }
@@ -211,18 +211,18 @@ function decideCardValue(currentCard) {
 }
 
 function drawCard() {
-  lastCard = currentDeck.pop()
+  const drawnCard = currentDeck.pop()
   remainingCardsCounterEl.textContent = currentDeck.length
   const cardDiv = document.createElement("div")
   cardDiv.classList.add("card")
   const cardImg = document.createElement("img")
-  cardImg.src = `deck/${lastCard}.png`
+  cardImg.src = `deck/${drawnCard}.png`
   cardDiv.append(cardImg)
-  let cardValue = decideCardValue(lastCard)
+  let cardValue = decideCardValue(drawnCard)
   // if player's turn
   if (playersTurn) {
     playerHandEl.append(cardDiv)
-    if (lastCard.slice(-1) === "A" && !playerHasAce) {
+    if (drawnCard.slice(-1) === "A" && !playerHasAce) {
       playerRoundTotal += 11
       playerHasAce = true
     } else if (playerSoft && playerHasAce && playerRoundTotal + cardValue > 21) {
@@ -250,10 +250,10 @@ function drawCard() {
       // TODO: slowdown dealer's cards for better animation and feels
       cardDiv.append(hiddenCardBackImg)
       dealerHandEl.append(cardDiv)
-      dealerHiddenCard = lastCard
+      dealerHiddenCard = drawnCard
     } else {
       dealerHandEl.append(cardDiv)
-      if (lastCard.slice(-1) === "A" && !dealerHasAce) {
+      if (drawnCard.slice(-1) === "A" && !dealerHasAce) {
         dealerRoundTotal += 11
         dealerHasAce = true
       } else if (dealerSoft && dealerHasAce && dealerRoundTotal + cardValue > 21) {
@@ -267,7 +267,7 @@ function drawCard() {
     }
   }
 
-  return lastCard
+  return drawnCard
 }
 
 function insertPlayerCard() {
@@ -367,11 +367,11 @@ function handleDealerBust() {
 }
 
 function startRound() {
-  // if balance is not enougth for doubling bet disable doubleBtn
+  // if balance is not enough for doubling bet disable doubleBtn
   doubleBtnEl.disabled = bankBalance < currentBet ? true : false
   if (currentDeck.length < 52) {
     currentDeck.length = 0
-    currentDeck.push(...shuffle())
+    currentDeck.push(...shuffleDeck())
   }
 
   //  console.log("kagitlar dagitildi")
