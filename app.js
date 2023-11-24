@@ -22,34 +22,28 @@ const hitBtnEl = document.querySelector("#hit-btn")
 const betBtnEl = document.querySelector("#bet-btn")
 const standBtnEl = document.querySelector("#stand-btn")
 const doubleBtnEl = document.querySelector("#double-btn")
+const playBtnEl = document.querySelector("#play-btn")
 
 let bankBalance = 1000
-let dealerHiddenCard = null
-let amountOfDecksInput = 4
+let amountOfDecks = 4
 let bankBalanceRestorePoint,
   dealerHasBJ,
-  dealerHasAce,
-  dealerSoft,
   playerHasBJ,
-  playerHasAce,
-  playerSoft,
   playersTurn,
   playerBusted,
   currentBet,
   doubleBet,
   dealerRoundTotal,
-  playerRoundTotal
+  playerRoundTotal,
+  dealerHiddenCard
 
 // TODO: put variables in the functions if possible
+// FIXME: dealer eksiye gidiyor ve deste sayısını kontrol et
 
 function initVariables() {
   dealerHasBJ = false
-  dealerHasAce = false
-  dealerSoft = true
   dealerRoundTotal = 0
   playerHasBJ = false
-  playerHasAce = false
-  playerSoft = true
   playerRoundTotal = 0
   playersTurn = false
   playerBusted = false
@@ -65,24 +59,22 @@ event listeners
 hitBtnEl.addEventListener("click", insertPlayerCard)
 standBtnEl.addEventListener("click", stand)
 doubleBtnEl.addEventListener("click", double)
-
-/****************
-settings section
-*****************/
-const hiddenCardBackImg = document.createElement("img")
-hiddenCardBackImg.id = "hiddenCardBack"
-const playBtnEl = document.querySelector("#play-btn")
 playBtnEl.addEventListener("click", saveSettings)
 
+const hiddenCardBackImg = document.createElement("img")
+hiddenCardBackImg.id = "hiddenCardBack"
+
 function saveSettings() {
-  amountOfDecksInput = document.getElementById("amountOfDecksInput").value
+  amountOfDecks = document.getElementById("amountOfDecksInput").value
   const deckColorInputEl = document.getElementsByName("deck-color")
+
   deckColorInputEl.forEach((item) => {
     if (item.checked) {
       hiddenCardBackImg.src = `others/${item.value}_back.png`
     }
   })
-  playerNameOutputEl.textContent = playerNameInputEl.value.substring(0, 12)
+
+  playerNameOutputEl.textContent = playerNameInputEl.value.substring(0, 12) || "Player"
   bankBalanceEl.textContent = bankBalance
   bankBalanceRestorePoint = bankBalance
   document.getElementById("settings-container").classList.toggle("hidden")
@@ -114,27 +106,32 @@ function betting() {
 function checkBalanceForButtons() {
   chipBtnsEl.forEach((btn) => {
     // if target chip's bet value bigger then bankBalance disable that chip
-    btn.disabled = Number(btn.textContent) > bankBalance ? true : false
+    btn.disabled = parseInt(btn.textContent) > bankBalance
   })
 
-  // if current bet equals to 0 then disable clearBet button
-  clearBetBtnEl.disabled = currentBet === 0 ? true : false
-  // if bank balance equals to 0 then disable all-in button
-  allInBtnEl.disabled = bankBalance === 0 ? true : false
+  // Disable the "clearBet" button if the current bet is zero.
+  clearBetBtnEl.disabled = currentBet === 0
+  // Disable the "allIn" button if the bank balance is zero.
+  allInBtnEl.disabled = bankBalance === 0
 }
 
 // add event listener to control-chips div
-controlChipsEl.addEventListener("click", (e) => {
+controlChipsEl.addEventListener("click", handleChipClick)
+
+function handleChipClick(e) {
   const clickedBtn = e.target
+
   if (clickedBtn.classList.contains("chip")) {
-    bankBalanceRestorePoint = bankBalanceRestorePoint ? bankBalanceRestorePoint : bankBalance
-    if (bankBalanceRestorePoint) currentBet += Number(clickedBtn.textContent)
+    bankBalanceRestorePoint = bankBalanceRestorePoint || bankBalance
+
+    if (bankBalanceRestorePoint) currentBet += parseInt(clickedBtn.textContent)
+
     firstBetEl.textContent = currentBet
-    bankBalance -= Number(clickedBtn.textContent)
+    bankBalance -= parseInt(clickedBtn.textContent)
     bankBalanceEl.textContent = bankBalance
     checkBalanceForButtons()
   }
-})
+}
 
 clearBetBtnEl.addEventListener("click", () => {
   currentBet = 0
@@ -169,7 +166,7 @@ const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
   clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "DT", "DJ", "DQ", "DK", "DA"],
+  diamonds: ["D2", "D3", "D4", "D5", "D6", "D7", "DA", "D2", "D3", "D4", "D5", "DK", "DA"],
 }
 
 function generateCombinedDecks(amountOfDecks) {
@@ -180,94 +177,96 @@ function generateCombinedDecks(amountOfDecks) {
     combinedDecks.push(...completeDeck)
   }
 
-  // console.log("desteler birlestirildi")
   return combinedDecks
 }
 
 function shuffleDeck() {
-  const arr = generateCombinedDecks(amountOfDecksInput)
+  const arr = generateCombinedDecks(amountOfDecks)
 
-  for (let i = arr.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
+  // for (let i = arr.length - 1; i > 0; i--) {
+  //   let j = Math.floor(Math.random() * (i + 1))
+  //   ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  // }
 
-  // console.log("deste karistirildi")
   return arr
 }
 
 function decideCardValue(currentCard) {
-  let cardFace = currentCard.slice(-1)
-  // ozel kartlar, regex
+  // console.log("currentCard " + currentCard)
+  const roundTotal = playersTurn ? playerRoundTotal : dealerRoundTotal
+  const hand = playersTurn ? playerHand : dealerHand
+  const hasAce = hand.some((card) => card.includes("A"))
+  const cardFace = currentCard.slice(-1)
   const KQJT = /(K|Q|J|T)/.test(cardFace) // true or false
+  let cardValue = null
+
   if (cardFace === "A") {
-    return 1
-    // gecerli kartin dosya isminde bu karakterler var mi? regex ile test
+    cardValue = 11 + roundTotal > 21 ? 1 : 11
   } else if (KQJT) {
-    return 10
+    cardValue = 10
   } else {
-    return parseInt(cardFace)
+    cardValue = parseInt(cardFace)
   }
+
+  if (hasAce && cardValue + roundTotal > 21) {
+    console.log(`${playersTurn ? "player" : "dealer"} için -10 çalıştı`)
+    cardValue -= 10
+  }
+
+  return cardValue
 }
 
 function drawCard() {
   const drawnCard = currentDeck.pop()
   remainingCardsCounterEl.textContent = currentDeck.length
+
+  if (playersTurn) {
+    roundTotalForPlayer(drawnCard)
+  } else {
+    roundTotalForDealer(drawnCard)
+  }
+  return drawnCard
+}
+
+function roundTotalForPlayer(drawnCard) {
+  const cardDiv = createCardElement(drawnCard)
+  const cardValue = decideCardValue(drawnCard)
+  playerHandEl.append(cardDiv)
+  playerRoundTotal += cardValue
+  playerRoundTotalEl.textContent = playerRoundTotal
+
+  // if player requested double bet, we don't need stand (again)
+  if (playerRoundTotal === 21 && !doubleBet) {
+    stand()
+  }
+
+  if (playerRoundTotal > 21) {
+    handlePlayerBust()
+  }
+}
+
+function roundTotalForDealer(drawnCard) {
+  const cardDiv = createCardElement(drawnCard)
+  const cardValue = decideCardValue(drawnCard)
+
+  if (dealerHand.length === 0) {
+    cardDiv.append(hiddenCardBackImg)
+    dealerHandEl.append(cardDiv)
+    dealerHiddenCard = drawnCard
+  } else {
+    dealerHandEl.append(cardDiv)
+    dealerRoundTotal += cardValue
+    dealerRoundTotalEl.textContent = dealerRoundTotal
+  }
+}
+
+function createCardElement(drawnCard) {
   const cardDiv = document.createElement("div")
   cardDiv.classList.add("card")
   const cardImg = document.createElement("img")
   cardImg.src = `deck/${drawnCard}.png`
   cardDiv.append(cardImg)
-  let cardValue = decideCardValue(drawnCard)
-  // if player's turn
-  if (playersTurn) {
-    playerHandEl.append(cardDiv)
-    if (drawnCard.slice(-1) === "A" && !playerHasAce) {
-      playerRoundTotal += 11
-      playerHasAce = true
-    } else if (playerSoft && playerHasAce && playerRoundTotal + cardValue > 21) {
-      playerRoundTotal += cardValue - 10
-      console.log("player -10 calisti")
-      playerSoft = false
-    } else {
-      playerRoundTotal += cardValue
-    }
-
-    playerRoundTotalEl.textContent = playerRoundTotal
-    // if player requested double bet, we don't need stand (again)
-    if (playerRoundTotal === 21 && !doubleBet) {
-      stand()
-    }
-
-    if (playerRoundTotal > 21) {
-      handlePlayerBust()
-    }
-  }
-
-  // if dealer's turn
-  if (!playersTurn) {
-    if (dealerHand.length === 0) {
-      // TODO: slowdown dealer's cards for better animation and feels
-      cardDiv.append(hiddenCardBackImg)
-      dealerHandEl.append(cardDiv)
-      dealerHiddenCard = drawnCard
-    } else {
-      dealerHandEl.append(cardDiv)
-      if (drawnCard.slice(-1) === "A" && !dealerHasAce) {
-        dealerRoundTotal += 11
-        dealerHasAce = true
-      } else if (dealerSoft && dealerHasAce && dealerRoundTotal + cardValue > 21) {
-        dealerRoundTotal += cardValue - 10
-        // console.log("dealer -10 calisti")
-        dealerSoft = false
-      } else {
-        dealerRoundTotal += cardValue
-      }
-      dealerRoundTotalEl.textContent = dealerRoundTotal
-    }
-  }
-
-  return drawnCard
+  return cardDiv
 }
 
 function insertPlayerCard() {
@@ -277,26 +276,20 @@ function insertPlayerCard() {
 }
 
 function handleHiddenCard() {
-  // playersTurn = false
-  if (dealerHiddenCard.slice(-1) === "A" && !dealerHasAce) {
-    dealerRoundTotal += 11
-    dealerHasAce = true
-  } else {
-    dealerRoundTotal += decideCardValue(dealerHiddenCard)
-  }
-
+  dealerRoundTotal += decideCardValue(dealerHiddenCard)
   dealerRoundTotalEl.textContent = dealerRoundTotal
+
   if (!hiddenCardBackImg.classList.contains("reveal")) {
     hiddenCardBackImg.classList.add("reveal")
-    if (dealerRoundTotal === 21 && dealerHand.length === 2) {
-      dealerHasBJ = true
-      dealerRoundTotalEl.classList.add("bj-glow")
-      dealerRoundTotalEl.textContent = "BJ"
-    }
+  }
+
+  if (dealerRoundTotal === 21 && dealerHand.length === 2) {
+    dealerHasBJ = true
+    dealerRoundTotalEl.classList.add("bj-glow")
+    dealerRoundTotalEl.textContent = "BJ"
   }
 
   dealerHiddenCard = null
-  // console.log("handle hidden card calisti")
 }
 
 function insertDealerCard() {
@@ -312,15 +305,13 @@ function insertDealerCard() {
     }
 
     if (playerHasBJ && !dealerHasBJ) {
-      console.log("playerHasBJ", playerHasBJ)
-      console.log("player blackjack win")
       handlePayment("bj", "win", "lose")
       return
     }
 
     playersTurn = false
+
     while (dealerRoundTotal < 17) {
-      // console.log("while loop calisti")
       dealerHand.push(drawCard())
 
       if (dealerRoundTotal > 21) {
@@ -328,6 +319,7 @@ function insertDealerCard() {
         return
       }
     }
+
     decideWinner()
   }, 2500)
 }
@@ -335,12 +327,10 @@ function insertDealerCard() {
 function stand() {
   disableRoundButtons()
   insertDealerCard()
-  // console.log("oyuncu kalkti")
 }
 
 function double() {
   doubleBet = true
-  // console.log("oyuncu iki katini istedi")
   bankBalance = bankBalance - currentBet
   bankBalanceEl.textContent = bankBalance
   currentBet = currentBet * 2
@@ -348,9 +338,7 @@ function double() {
   disableRoundButtons()
   insertPlayerCard()
 
-  if (!playerBusted) {
-    insertDealerCard()
-  }
+  if (!playerBusted) insertDealerCard()
 }
 
 function handlePlayerBust() {
@@ -358,23 +346,20 @@ function handlePlayerBust() {
   disableRoundButtons()
   handleHiddenCard()
   handlePayment("lose", "bust", "win")
-  // console.log("oyuncu patladi")
 }
 
 function handleDealerBust() {
   handlePayment("win", "win", "bust")
-  // console.log("dealer patladi")
 }
 
 function startRound() {
-  // if balance is not enough for doubling bet disable doubleBtn
-  doubleBtnEl.disabled = bankBalance < currentBet ? true : false
-  if (currentDeck.length < 52) {
+  // if balance is not enough for doubling the bet then disable doubleBtn
+  doubleBtnEl.disabled = bankBalance < currentBet
+  if (currentDeck.length <= 52) {
     currentDeck.length = 0
     currentDeck.push(...shuffleDeck())
   }
 
-  //  console.log("kagitlar dagitildi")
   dealerHand.push(drawCard())
   dealerHand.push(drawCard())
   playersTurn = true
@@ -383,19 +368,15 @@ function startRound() {
 }
 
 function decideWinner() {
-  if (playerRoundTotal === dealerRoundTotal) {
-    if (dealerHasBJ && !playerHasBJ) {
-      console.log("dealerHasBJ", dealerHasBJ)
-      console.log("dealer blackjack win")
-      handlePayment("lose", "lose", "win")
-    } else {
-      handlePayment("tie", "tie", "tie")
-    }
-  }
-  if (playerRoundTotal > dealerRoundTotal && playerRoundTotal <= 21) {
+  //TODO: think about this
+  if (playerRoundTotal === dealerRoundTotal && dealerHasBJ && !playerHasBJ) {
+    handlePayment("lose", "lose", "win")
+  } else if (playerRoundTotal > dealerRoundTotal && playerRoundTotal <= 21) {
     handlePayment("win", "win", "lose")
   } else if (playerRoundTotal < dealerRoundTotal && dealerRoundTotal <= 21) {
     handlePayment("lose", "lose", "win")
+  } else {
+    handlePayment("tie", "tie", "tie")
   }
 }
 
@@ -448,7 +429,6 @@ function checkGameOver() {
     restartBtnEl.addEventListener("click", () => location.reload())
     document.querySelector("#betting-container").classList.toggle("hidden")
     document.querySelector("#game-over").classList.toggle("hidden")
-    // console.log("game over")
     setTimeout(() => location.reload(), 9000)
   }
 }
@@ -469,21 +449,32 @@ function handlePayment(payment, playerEvent, dealerEvent) {
       break
   }
 
+  handleRibbon(playerEvent, dealerEvent)
+  resetRound()
+}
+
+function handleRibbon(playerEvent, dealerEvent) {
   playerRibbonEl.textContent =
-    playerEvent === "bust" ? "Bust!" : playerEvent === "tie" ? "Tie - Push!" : `You ${playerEvent}!`
-  playerRibbonEl.classList.add("ribbon", `ribbon-${playerEvent}`)
+    playerEvent === "bust"
+      ? "Bust!"
+      : playerEvent === "tie"
+      ? "Tie - Push!"
+      : `${playerNameOutputEl.textContent} ${playerEvent}!`
+
   dealerRibbonEl.textContent =
     dealerEvent === "bust"
       ? "Bust!"
       : dealerEvent === "tie"
       ? "Tie - Push!"
       : `Dealer ${dealerEvent}!`
+
+  playerRibbonEl.classList.add("ribbon", `ribbon-${playerEvent}`)
   dealerRibbonEl.classList.add("ribbon", `ribbon-${dealerEvent}`)
+
   playerRibbonEl.classList.remove("hidden")
   dealerRibbonEl.classList.remove("hidden")
+
   bankBalanceEl.textContent = bankBalance
-  resetRound()
-  // console.log("handle payment calisti")
 }
 
 /****************
@@ -491,7 +482,5 @@ helper functions
 *****************/
 // Removes all children of the element.
 function removeAllChildren(element) {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild)
-  }
+  while (element.firstChild) element.removeChild(element.firstChild)
 }

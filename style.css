@@ -25,6 +25,7 @@ body {
   font-weight: 700;
   font-size: 2rem;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   user-select: none;
 }
