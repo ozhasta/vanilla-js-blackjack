@@ -4,8 +4,8 @@
 }
 
 *,
-*::before,
-*::after {
+::before,
+::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -97,7 +97,7 @@ main {
   margin: 1rem;
 }
 
-.round-total {
+.score {
   position: relative;
   padding: 1.25rem;
   width: 7rem;
@@ -180,7 +180,7 @@ reveal hidden card
   font-size: 3rem;
 }
 
-#splash-screen {
+#dark-gradient-splash {
   flex-direction: column;
   position: fixed;
   inset: 0;
@@ -271,7 +271,8 @@ ribbon
 }
 
 /* ribbon-win */
-.ribbon-win {
+.ribbon-win,
+.ribbon-bj {
   color: var(--ribbon-win-color);
   background: var(--ribbon-win-background);
 }
@@ -325,7 +326,7 @@ chips
   background: #e67f02;
 }
 
-.chip.lblue {
+.chip.light-blue {
   background: #2871c9;
 }
 
@@ -333,7 +334,7 @@ chips
   background: #7600d6;
 }
 
-.chip.dblue {
+.chip.dark-blue {
   background: #031a36;
 }
 
@@ -383,7 +384,7 @@ controls
   width: 8rem;
 }
 
-#bet-mid #currency-sign {
+#currency-sign {
   display: inline-block;
   font-size: 3rem;
   margin-left: 3rem;
