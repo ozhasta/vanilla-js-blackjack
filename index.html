@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#004526">
     <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
+    <script src="app.js" type="module"></script>
     <title>BlackJack</title>
   </head>
   <body>
@@ -18,6 +18,7 @@
             <input
               type="range"
               id="amountOfDecksInput"
+              name="amountOfDecksInput"
               value="4"
               min="2"
               max="8"
@@ -85,7 +86,7 @@
         <div class="dealerHand">
           <div class="cards"></div>
           <span id="dealer-score" class="score">0</span>
-          <div class="hidden" id="dealer-ribbon"></div>
+          <div class="ribbon hidden" id="dealer-ribbon"></div>
         </div>
         <div id="round">
           <button id="double-btn" class="chip">X2</button>
@@ -94,7 +95,7 @@
         <div class="playerHand">
           <div class="cards"></div>
           <span id="player-score" class="score">0</span>
-          <div class="hidden" id="player-ribbon"></div>
+          <div class="hidden ribbon" id="player-ribbon"></div>
         </div>
         <span id="player-name-output" class="nick-name">Player</span>
       </div>

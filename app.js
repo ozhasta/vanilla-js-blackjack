@@ -1,28 +1,29 @@
-"use strict"
-const dealerHand = []
-const playerHand = []
-const currentDeck = []
+import { updateClass, removeAllChildren, delay } from "./helperFunctions.js"
+
+const dealerHandArr = []
+const playerHandArr = []
+const currentDeckArr = []
 const playerHandEl = document.querySelector(".playerHand .cards")
 const dealerHandEl = document.querySelector(".dealerHand .cards")
-const playerScoreEl = document.querySelector("#player-score")
-const dealerScoreEl = document.querySelector("#dealer-score")
+const playerScoreEl = document.getElementById("player-score")
+const dealerScoreEl = document.getElementById("dealer-score")
 const remainingCardsCounterEl = document.querySelector(".remaining-cards > span")
-const playerNameOutputEl = document.querySelector("#player-name-output")
-const bankBalanceEl = document.querySelector("#bank-balance")
-const firstBetPlaceholderEl = document.querySelector("#first-bet-placeholder")
+const playerNameOutputEl = document.getElementById("player-name-output")
+const bankBalanceEl = document.getElementById("bank-balance")
+const firstBetPlaceholderEl = document.getElementById("first-bet-placeholder")
 const controlChipsEl = document.querySelector(".control-chips")
 const chipBtnsEl = document.querySelectorAll(".control-chips > .chip")
-const roundBetEl = document.querySelector("#round-bet")
-const clearBetBtnEl = document.querySelector("#clear-btn")
-const allInBtnEl = document.querySelector("#all-in-btn")
-const dealerRibbonEl = document.querySelector("#dealer-ribbon")
-const playerRibbonEl = document.querySelector("#player-ribbon")
-const playerNameInputEl = document.querySelector("#player-name-input")
-const hitBtnEl = document.querySelector("#hit-btn")
-const betBtnEl = document.querySelector("#bet-btn")
-const standBtnEl = document.querySelector("#stand-btn")
-const doubleBtnEl = document.querySelector("#double-btn")
-const playBtnEl = document.querySelector("#play-btn")
+const roundBetEl = document.getElementById("round-bet")
+const clearBetBtnEl = document.getElementById("clear-btn")
+const allInBtnEl = document.getElementById("all-in-btn")
+const dealerRibbonEl = document.getElementById("dealer-ribbon")
+const playerRibbonEl = document.getElementById("player-ribbon")
+const playerNameInputEl = document.getElementById("player-name-input")
+const hitBtnEl = document.getElementById("hit-btn")
+const betBtnEl = document.getElementById("bet-btn")
+const standBtnEl = document.getElementById("stand-btn")
+const doubleBtnEl = document.getElementById("double-btn")
+const playBtnEl = document.getElementById("play-btn")
 
 let bankBalance = 1000
 let amountOfDecks = 4
@@ -35,7 +36,6 @@ let bankBalanceRestorePoint,
   playerScore,
   dealerHasBJ,
   playerHasBJ,
-  dealerHiddenCard,
   isRoundCompleted
 
 function initVariables() {
@@ -44,14 +44,13 @@ function initVariables() {
   playersTurn = false
   currentBet = 0
   doubleBet = false
-  dealerHiddenCard = null
   isRoundCompleted = false
   dealerHasBJ = false
   playerHasBJ = false
 }
 initVariables()
 
-hitBtnEl.addEventListener("click", insertPlayerCard)
+hitBtnEl.addEventListener("click", drawCardForPlayer)
 standBtnEl.addEventListener("click", stand)
 doubleBtnEl.addEventListener("click", double)
 playBtnEl.addEventListener("click", saveSettings)
@@ -63,7 +62,7 @@ function createHiddenCardBackImg() {
 
 function saveSettings(e) {
   e.preventDefault()
-  amountOfDecks = document.getElementById("amountOfDecksInput").value
+  amountOfDecks = document.getElementById("amountOfDecksInput").value || amountOfDecks
   const deckColorInputEl = document.getElementsByName("deck-color")
   createHiddenCardBackImg()
 
@@ -84,9 +83,6 @@ function saveSettings(e) {
   betting()
 }
 
-/****************
-betting section
-*****************/
 function betting() {
   betBtnEl.addEventListener("click", () => {
     if (currentBet === 0) return
@@ -114,43 +110,42 @@ function checkBalanceForButtons() {
   allInBtnEl.disabled = bankBalance === 0
 }
 
-// add event listener to control-chips div
-controlChipsEl.addEventListener("click", handleChipClick)
+function initEventHandlers() {
+  controlChipsEl.addEventListener("click", handleChipClick)
 
-function handleChipClick(e) {
-  const clickedBtn = e.target
+  function handleChipClick(e) {
+    const clickedBtn = e.target
 
-  if (clickedBtn.classList.contains("chip")) {
-    bankBalanceRestorePoint = bankBalanceRestorePoint || bankBalance
+    if (clickedBtn.classList.contains("chip")) {
+      bankBalanceRestorePoint = bankBalanceRestorePoint || bankBalance
 
-    if (bankBalanceRestorePoint) currentBet += parseInt(clickedBtn.textContent)
+      if (bankBalanceRestorePoint) currentBet += parseInt(clickedBtn.textContent)
 
+      firstBetPlaceholderEl.textContent = currentBet
+      bankBalance -= parseInt(clickedBtn.textContent)
+      bankBalanceEl.textContent = bankBalance
+      checkBalanceForButtons()
+    }
+  }
+
+  clearBetBtnEl.addEventListener("click", () => {
+    currentBet = 0
     firstBetPlaceholderEl.textContent = currentBet
-    bankBalance -= parseInt(clickedBtn.textContent)
+    bankBalance = bankBalanceRestorePoint
+    bankBalanceEl.textContent = bankBalanceRestorePoint
+    checkBalanceForButtons()
+  })
+
+  allInBtnEl.addEventListener("click", () => {
+    currentBet += bankBalance
+    firstBetPlaceholderEl.textContent = currentBet
+    bankBalance = 0
     bankBalanceEl.textContent = bankBalance
     checkBalanceForButtons()
-  }
+  })
 }
+initEventHandlers()
 
-clearBetBtnEl.addEventListener("click", () => {
-  currentBet = 0
-  firstBetPlaceholderEl.textContent = currentBet
-  bankBalance = bankBalanceRestorePoint
-  bankBalanceEl.textContent = bankBalanceRestorePoint
-  checkBalanceForButtons()
-})
-
-allInBtnEl.addEventListener("click", () => {
-  currentBet += bankBalance
-  firstBetPlaceholderEl.textContent = currentBet
-  bankBalance = 0
-  bankBalanceEl.textContent = bankBalance
-  checkBalanceForButtons()
-})
-
-/****************
-game section
-*****************/
 /* deck copy for debugging
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
@@ -164,8 +159,8 @@ game section
 const deck = {
   hearts: ["H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "HT", "HJ", "HQ", "HK", "HA"],
   spades: ["S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "ST", "SJ", "SQ", "SK", "SA"],
-  clubs: ["C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CT", "CJ", "CQ", "CK", "CA"],
-  diamonds: ["H8", "CA", "SK", "HA", "D2"], // player bj
+  clubs: ["C2", "C3", "C4", "C3", "C2", "CA", "C4", "C3", "C2", "CA", "C4", "C3", "C2"],
+  diamonds: ["HA", "H4", "H3", "H2", "HA"], // player bj
 }
 
 function generateCombinedDecks(amountOfDecks) {
@@ -188,23 +183,24 @@ function shuffleDeck() {
     ;[arr[i], arr[j]] = [arr[j], arr[i]]
   }
 
-  // return arr
+  return arr
 }
 
 function decideCardValue(currentCard) {
-  // console.log("currentCard " + currentCard)
   const score = playersTurn ? playerScore : dealerScore
-  const hand = playersTurn ? playerHand : dealerHand
+  const hand = playersTurn ? playerHandArr : dealerHandArr
   const hasAce = hand.some((card) => card.includes("A"))
   const cardFace = currentCard.slice(-1)
   const KQJT = /(K|Q|J|T)/.test(cardFace) // true or false
-  let cardValue = 0
-  //TODO: test this
-  if (hasAce && cardValue + score > 21) {
-    console.log(`${playersTurn ? "player" : "dealer"} için -10 çalıştı`)
-    cardValue -= 10
-  } else if (cardFace === "A") {
-    cardValue = 11 + score > 21 ? 1 : 11
+  let cardValue
+
+  if (cardFace === "A") {
+    if (hasAce && score + 11 < 21) {
+      cardValue = 11
+    } else {
+      cardValue = 1
+    }
+    cardValue = 1
   } else if (KQJT) {
     cardValue = 10
   } else {
@@ -215,40 +211,30 @@ function decideCardValue(currentCard) {
 }
 
 function drawCard() {
-  const card = currentDeck.pop()
-  remainingCardsCounterEl.textContent = currentDeck.length
-
-  playersTurn ? updateScoreForPlayer(card) : updateScoreForDealer(card)
+  const card = currentDeckArr.pop()
+  remainingCardsCounterEl.textContent = currentDeckArr.length
 
   return card
 }
 
-function drawCardForPlayer() {
-  playersTurn = true
-  const card = drawCard()
-  playerHand.push(card)
-  // updateScoreForPlayer(card)
+function checkDealerStatus() {
+  dealerHasBJ = dealerScore === 21 && dealerHandArr.length === 2
+
+  if (dealerHasBJ) {
+    handleBlackJack()
+    return
+  }
 }
 
-function drawCardForDealer() {
-  playersTurn = false
-  const card = drawCard()
-  dealerHand.push(card)
-  updateScoreForDealer(card)
-}
+function checkPlayerStatus() {
+  playerHasBJ = playerScore === 21 && playerHandArr.length === 2
+  if (playerHasBJ) {
+    handleBlackJack()
+    console.log("player have blackjack")
+    return
+  }
 
-function updateScoreForPlayer(card) {
-  const cardDiv = createCardElement(card)
-  const cardValue = decideCardValue(card)
-
-  playerHandEl.append(cardDiv)
-  playerScore += cardValue
-  playerScoreEl.textContent = playerScore
-
-  // if player requested double bet, we don't need stand (again)
-
-  console.log("playerScore", playerScore, "playerHand", playerHand)
-  if (playerScore === 21 && !doubleBet) {
+  if (playerScore === 21 || doubleBet) {
     stand()
     return
   }
@@ -260,20 +246,49 @@ function updateScoreForPlayer(card) {
   }
 }
 
+function drawCardForPlayer() {
+  playersTurn = true
+  const card = drawCard()
+  playerHandArr.push(card)
+  updateScoreForPlayer(card)
+  renderPlayerCard(card)
+  checkPlayerStatus()
+}
+
+function drawCardForDealer() {
+  playersTurn = false
+  const card = drawCard()
+  dealerHandArr.push(card)
+  updateScoreForDealer(card)
+  renderDealerCard(card)
+  checkDealerStatus()
+}
+
+function updateScoreForPlayer(card) {
+  // const cardValue = decideCardValue(card)
+
+  // if (cardValue === 1 && playerScore + 11 > 21) {
+  //   playerScore += 1
+  // } else {
+  //   playerScore += cardValue
+  // }
+
+  playerScoreEl.textContent = playerScore
+}
+
 function updateScoreForDealer(card) {
-  const cardDiv = createCardElement(card)
   const cardValue = decideCardValue(card)
-  const isFirstCard = dealerHand.length === 0
+  const isFirstCard = dealerHandArr.length === 1
 
-  dealerScore += cardValue
+  // if (cardValue === 1 && dealerScore + 11 < 21) {
+  //   dealerScore += 11
+  // } else {
+  //   dealerScore += cardValue
+  // }
 
-  if (isFirstCard) {
-    cardDiv.append(hiddenCardBackImg)
-  } else {
-    dealerScoreEl.textContent = dealerScore - decideCardValue(dealerHand[0])
+  if (!isFirstCard) {
+    dealerScoreEl.textContent = dealerScore - decideCardValue(dealerHandArr[0])
   }
-
-  dealerHandEl.append(cardDiv)
 }
 
 function createCardElement(card) {
@@ -286,28 +301,34 @@ function createCardElement(card) {
   return cardDiv
 }
 
-function insertPlayerCard() {
-  playersTurn = true
-  doubleBtnEl.disabled = true
-  playerHand.push(drawCard())
+function renderDealerCard(card) {
+  const cardDiv = createCardElement(card)
+  const isFirstCard = dealerHandArr.length === 1
+
+  if (isFirstCard) {
+    cardDiv.append(hiddenCardBackImg)
+  }
+
+  dealerHandEl.append(cardDiv)
 }
 
-function handleHiddenCard() {
+function renderPlayerCard(card) {
+  const cardDiv = createCardElement(card)
+  playerHandEl.append(cardDiv)
+}
+
+function revealHiddenCard() {
   // dealerScore += decideCardValue(dealerHiddenCard)
   dealerScoreEl.textContent = dealerScore
   updateClass("hiddenCardBack", "add", "reveal")
 }
 
 function insertDealerCard() {
-  if (playerScore > 21 || playerHasBJ) return
-
-  playersTurn = false
-
   while (dealerScore < 17) {
-    dealerHand.push(drawCard())
+    drawCardForDealer()
   }
 
-  decideWinner()
+  return decideWinner()
 }
 
 function stand() {
@@ -322,41 +343,31 @@ function double() {
   currentBet = currentBet * 2
   roundBetEl.textContent = currentBet
   disableRoundButtons()
-  insertPlayerCard()
+  drawCardForPlayer()
 
   const playerBusted = playerScore > 21
 
-  if (!playerBusted) insertDealerCard()
+  return playerBusted ? decideWinner() : insertDealerCard()
 }
 
 function startRound() {
   // if balance is not enough for doubling the bet then disable doubleBtnEl
   doubleBtnEl.disabled = bankBalance < currentBet
 
-  if (currentDeck.length <= 52) {
-    currentDeck.length = 0
-    currentDeck.push(...shuffleDeck())
+  // When the deck reaches below 52 cards, new decks are added and
+  // the cards are shuffled, making it more difficult to count the cards.
+  if (currentDeckArr.length <= 52) {
+    currentDeckArr.length = 0
+    currentDeckArr.push(...shuffleDeck())
   }
 
-  // dealerHand.push(drawCard())
-  // dealerHand.push(drawCard())
   drawCardForDealer()
   drawCardForDealer()
-  // playersTurn = true
-  // playerHand.push(drawCard())
-  // playerHand.push(drawCard())
   drawCardForPlayer()
   drawCardForPlayer()
-
-  handleBlackJack()
 }
 
 function handleBlackJack() {
-  dealerHasBJ = dealerScore === 21 && dealerHand.length === 2
-  playerHasBJ = playerScore === 21 && playerHand.length === 2
-
-  if (!playerHasBJ || !dealerHasBJ) return
-
   disableRoundButtons()
 
   if (dealerHasBJ) {
@@ -376,33 +387,31 @@ async function decideWinner() {
   if (isRoundCompleted) return
 
   isRoundCompleted = true
-  handleHiddenCard()
+  revealHiddenCard()
   await delay(2500)
   let paymentEvent
 
-  if (dealerHasBJ && playerHasBJ) {
-    paymentEvent = ["tie", "tie", "tie"]
+  if ((dealerHasBJ && playerHasBJ) || playerScore === dealerScore) {
+    paymentEvent = "tie"
   } else if (dealerHasBJ) {
-    paymentEvent = ["lose", "lose", "bj"]
+    paymentEvent = "lose"
   } else if (playerHasBJ) {
-    paymentEvent = ["bj", "bj", "lose"]
-  } else if (playerScore > 21) {
-    paymentEvent = ["lose", "bust", "win"]
+    paymentEvent = "bj"
   } else if (dealerScore > 21) {
-    paymentEvent = ["win", "win", "bust"]
+    paymentEvent = "win"
+  } else if (playerScore > 21) {
+    paymentEvent = "lose"
   } else if (playerScore === dealerScore) {
-    paymentEvent = ["tie", "tie", "tie"]
-  } else if (playerScore > dealerScore) {
-    paymentEvent = ["win", "win", "lose"]
+    paymentEvent = "tie"
   } else if (playerScore < dealerScore) {
-    paymentEvent = ["lose", "lose", "win"]
+    paymentEvent = "lose"
+  } else if (playerScore > dealerScore) {
+    paymentEvent = "win"
   } else {
-    console.error("Error: check events in decideWinner") // debug
+    console.error("Invalid paymentEvent:", paymentEvent) // debug
   }
-  console.log("playerHasBJ➡️", playerHasBJ)
-  console.log("dealerHasBJ➡️", dealerHasBJ)
-  console.log(paymentEvent)
-  return handlePayment(...paymentEvent)
+
+  return handlePayment(paymentEvent)
 }
 
 function disableRoundButtons() {
@@ -430,12 +439,12 @@ async function resetRound() {
   updateClass("dealer-score", "remove", "bj-glow")
   updateClass("player-score", "remove", "bj-glow")
   updateClass("hiddenCardBack", "remove", "reveal")
-  dealerRibbonEl.className = "hidden"
-  playerRibbonEl.className = "hidden"
+  dealerRibbonEl.className = "ribbon hidden"
+  playerRibbonEl.className = "ribbon hidden"
   dealerScoreEl.textContent = 0
   playerScoreEl.textContent = 0
-  dealerHand.length = 0
-  playerHand.length = 0
+  dealerHandArr.length = 0
+  playerHandArr.length = 0
   firstBetPlaceholderEl.textContent = 0
   removeAllChildren(dealerHandEl)
   removeAllChildren(playerHandEl)
@@ -448,19 +457,16 @@ async function resetRound() {
 async function checkGameOver() {
   // if balance is not enough for bet then game over :(
   if (bankBalance === 0 && currentBet === 0 && bankBalanceRestorePoint === 0) {
-    const restartBtnEl = document.querySelector("#restart-btn")
+    const restartBtnEl = document.getElementById("restart-btn")
     restartBtnEl.addEventListener("click", () => location.reload())
-    document.querySelector("#betting-container").classList.toggle("hidden")
-    document.querySelector("#game-over").classList.toggle("hidden")
+    document.getElementById("betting-container").classList.toggle("hidden")
+    document.getElementById("game-over").classList.toggle("hidden")
     await delay(9000)
     location.reload()
   }
 }
 
-/****************
-computing balance
-*****************/
-function handlePayment(payment, playerEvent, dealerEvent) {
+function handlePayment(payment) {
   switch (payment) {
     case "tie":
       bankBalance += currentBet
@@ -473,63 +479,27 @@ function handlePayment(payment, playerEvent, dealerEvent) {
       break
   }
 
-  handleRibbon(playerEvent, dealerEvent, payment)
+  handleRibbon(payment)
   resetRound()
   return
 }
 
-function handleRibbon(playerEvent, dealerEvent, payment) {
+function handleRibbon(playerMsg) {
+  const playerName = playerNameOutputEl.textContent
+  let dealerMsg = "tie"
+
+  if (playerMsg === "lose") dealerMsg = "win"
+
+  if (playerMsg === "win" || playerMsg === "bj") dealerMsg = "lose"
+
+  dealerRibbonEl.textContent = dealerMsg === "tie" ? "Tie - Push!" : `Dealer ${dealerMsg}!`
   playerRibbonEl.textContent =
-    playerEvent === "tie"
-      ? "Tie - Push!"
-      : `${playerNameOutputEl.textContent} ${playerEvent.toUpperCase()}!`
+    playerMsg === "tie" ? "Tie - Push!" : `${playerName} ${playerMsg === "bj" ? "win" : playerMsg}!`
+  dealerRibbonEl.classList.add(`ribbon-${dealerMsg}`)
+  playerRibbonEl.classList.add(`ribbon-${playerMsg === "bj" ? "win" : playerMsg}`)
 
-  dealerRibbonEl.textContent =
-    dealerEvent === "tie" ? "Tie - Push!" : `Dealer ${dealerEvent.toUpperCase()}!`
-
-  playerRibbonEl.classList.add("ribbon", `ribbon-${playerEvent}`)
-  dealerRibbonEl.classList.add("ribbon", `ribbon-${dealerEvent}`)
-
-  updateClass("player-ribbon", "remove", "hidden")
   updateClass("dealer-ribbon", "remove", "hidden")
+  updateClass("player-ribbon", "remove", "hidden")
 
   bankBalanceEl.textContent = bankBalance
-  // console.log(`Payment: ${payment}, playerEvent: ${playerEvent}, dealerEvent: ${dealerEvent}`)
-}
-
-/****************
-helper functions
-*****************/
-function updateClass(elementId, action, className) {
-  const element = document.getElementById(elementId)
-
-  if (!element) {
-    console.error(`Invalid element id: "${elementId}"`)
-    return
-  }
-
-  switch (action) {
-    case "add":
-      element.classList.add(className)
-      break
-
-    case "remove":
-      element.classList.remove(className)
-      break
-
-    case "toggle":
-      element.classList.toggle(className)
-      break
-
-    default:
-      console.error(`Invalid action: "${action}"`)
-  }
-}
-
-function removeAllChildren(element) {
-  while (element.firstChild) element.removeChild(element.firstChild)
-}
-
-function delay(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }

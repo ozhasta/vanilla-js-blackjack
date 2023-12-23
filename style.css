@@ -264,6 +264,8 @@ ribbon
   margin-top: calc((var(--card-size) / 2) - 2rem);
   width: calc(var(--card-size) * 1.5);
   font-size: 2.5rem;
+  text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff,
+    1px -1px #fff, -1px 1px #fff;
   padding: 1rem;
   border-radius: 8px;
   opacity: 0.95;
@@ -271,8 +273,7 @@ ribbon
 }
 
 /* ribbon-win */
-.ribbon-win,
-.ribbon-bj {
+.ribbon-win {
   color: var(--ribbon-win-color);
   background: var(--ribbon-win-background);
 }
@@ -284,8 +285,7 @@ ribbon
 }
 
 /* ribbon-lose */
-.ribbon-lose,
-.ribbon-bust {
+.ribbon-lose {
   color: var(--ribbon-lose-color);
   background: var(--ribbon-lose-background);
 }
