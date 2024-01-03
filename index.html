@@ -1,123 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#004526">
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" type="module"></script>
-    <title>BlackJack</title>
-  </head>
-  <body>
-    <main>
-      <div id="settings-container">
-        <!-- start of settings-container div -->
-        <form name="settings" id="settings">
-          <div class="settings-section">
-            <p>Choose the number of decks:</p>
-            <input
-              type="range"
-              id="amountOfDecksInput"
-              name="amountOfDecksInput"
-              value="4"
-              min="2"
-              max="8"
-              step="2"
-              oninput="output.value = amountOfDecksInput.value"
-            >
-            <output id="output">4</output>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#004526">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" type="module"></script>
+  <title>BlackJack</title>
+</head>
+
+<body>
+  <main>
+    <!-- start of settings-container div -->
+    <div id="settings-container">
+      <form name="settings" id="settings">
+        <div class="settings-section">
+          <p>Choose the number of decks:</p>
+          <input type="range" id="amountOfDecksInput" name="amountOfDecksInput" value="4" min="2"
+            max="8" step="2" oninput="output.value = amountOfDecksInput.value">
+          <output id="output">4</output>
+        </div>
+        <div class="settings-section">
+          <p>Choose deck color:</p>
+          <div>
+            <input type="radio" id="blue" name="deck-color" value="blue" checked>
+            <label for="blue"><img src="img/others/blue_back_mini.png" alt="blue"></label>
           </div>
-          <div class="settings-section">
-            <p>Choose deck color:</p>
-            <div>
-              <input type="radio" id="blue" name="deck-color" value="blue" checked>
-              <label for="blue"><img src="others/blue_back_mini.png" alt="blue"></label>
-            </div>
-            <div>
-              <input type="radio" id="red" name="deck-color" value="red">
-              <label for="red"><img src="others/red_back_mini.png" alt="red"></label>
-            </div>
-            <div>
-              <input type="radio" id="green" name="deck-color" value="green">
-              <label for="green"><img src="others/green_back_mini.png" alt="green"></label>
-            </div>
-            <br>
-            <div>
-              <input type="radio" id="yellow" name="deck-color" value="yellow">
-              <label for="yellow"><img src="others/yellow_back_mini.png" alt="yellow"></label>
-            </div>
-            <div>
-              <input type="radio" id="purple" name="deck-color" value="purple">
-              <label for="purple"><img src="others/purple_back_mini.png" alt="purple"></label>
-            </div>
-            <div>
-              <input type="radio" id="gray" name="deck-color" value="gray">
-              <label for="gray"><img src="others/gray_back_mini.png" alt="gray"></label>
-            </div>
+          <div>
+            <input type="radio" id="red" name="deck-color" value="red">
+            <label for="red"><img src="img/others/red_back_mini.png" alt="red"></label>
           </div>
-          <div class="settings-section">
-            <p>What is your name?</p>
-            <input type="text" id="player-name-input" name="player-name-input" value="Player">
+          <div>
+            <input type="radio" id="green" name="deck-color" value="green">
+            <label for="green"><img src="img/others/green_back_mini.png" alt="green"></label>
           </div>
-          <button id="play-btn">PLAY</button>
-        </form>
-      </div>
-      <!-- end of settings-container div -->
-      <div id="balance" class="hidden">
-        <div>Bank</div>
-        <span>$<span id="bank-balance">0</span></span>
-      </div>
-      <div id="betting-container" class="hidden">
-        <div id="bet-mid">
-          <button id="bet-btn" class="game-btn">BET</button>
-          <span id="currency-sign">$<span id="first-bet-placeholder">0</span></span>
-        </div>
-      </div>
-      <div id="game-over" class="hidden">
-        <p>Game Over</p>
-        <button id="restart-btn" class="game-btn">Restart</button>
-      </div>
-      <!-- start of round-container div -->
-      <div id="round-container" class="hidden">
-        <div class="remaining-cards">
-          <img src="others/remaining-cards.png" alt="remaining-cards"><br><span>0</span>
-        </div>
-        <span class="nick-name">Dealer</span>
-        <div class="dealerHand">
-          <div class="cards"></div>
-          <span id="dealer-score" class="score">0</span>
-          <div class="ribbon hidden" id="dealer-ribbon"></div>
-        </div>
-        <div id="round">
-          <button id="double-btn" class="chip">X2</button>
-          <span>$<span id="round-bet">0</span></span>
-        </div>
-        <div class="playerHand">
-          <div class="cards"></div>
-          <span id="player-score" class="score">0</span>
-          <div class="hidden ribbon" id="player-ribbon"></div>
-        </div>
-        <span id="player-name-output" class="nick-name">Player</span>
-      </div>
-      <!-- end of round-container div -->
-      <div id="dark-gradient-splash" class="hidden"></div>
-      <div id="fixed-bottom">
-        <div id="betting-fixed-bottom" class="hidden">
-          <div class="control-chips">
-            <button class="chip red">10</button>
-            <button class="chip orange">50</button>
-            <button class="chip light-blue">100</button>
-            <button class="chip purple">250</button>
-            <button class="chip dark-blue">500</button>
+          <br>
+          <div>
+            <input type="radio" id="yellow" name="deck-color" value="yellow">
+            <label for="yellow"><img src="img/others/yellow_back_mini.png" alt="yellow"></label>
           </div>
-          <button id="clear-btn" class="game-btn">CLEAR BET</button>
-          <button id="all-in-btn" class="game-btn">ALL IN</button>
+          <div>
+            <input type="radio" id="purple" name="deck-color" value="purple">
+            <label for="purple"><img src="img/others/purple_back_mini.png" alt="purple"></label>
+          </div>
+          <div>
+            <input type="radio" id="gray" name="deck-color" value="gray">
+            <label for="gray"><img src="img/others/gray_back_mini.png" alt="gray"></label>
+          </div>
         </div>
-        <div id="round-fixed-bottom" class="hidden">
-          <button id="hit-btn" class="game-btn">HIT</button>
-          <button id="stand-btn" class="game-btn">STAND</button>
+        <div class="settings-section">
+          <p>What is your name?</p>
+          <input type="text" id="player-name-input" name="player-name-input" value="Player">
+        </div>
+        <button id="play-btn">PLAY</button>
+      </form>
+      <button title="Click here for the rules." id="help-btn">How to play?</button>
+      <dialog id="help-dialog">
+        <div class="rules">
+
+          <span>Objective:</span>
+          <ul>
+            <li>Goal is to approach a total card value of 21 or not exceed it.</li>
+          </ul>
+          <span>Card Values:</span>
+          <ul>
+            <li>Numbered cards (2 to 10) have their face value.</li>
+            <li>Face cards (Jack, Queen, King) are each worth 10.</li>
+            <li>Aces can be worth 1 or 11.</li>
+          </ul>
+          <span>Game Flow:</span>
+          <ul>
+            <li>Each player and the dealer initially receive 2 cards.</li>
+            <li>
+              Players can draw additional cards to get as close to 21 as possible without exceeding
+              it.
+            </li>
+            <li>Players evaluate their hand value after drawing cards and aim not to exceed 21.</li>
+            <li>If a player exceeds 21, they "bust" and lose the round.</li>
+            <li>
+              The dealer reveals their cards after players' actions and draws cards until reaching a
+              value of 17 or higher.
+            </li>
+          </ul>
+          <span>Winning Conditions:</span>
+          <ul>
+            <li>
+              If a player hits exactly 21 without drawing any additional cards, they achieve a
+              "Blackjack" and receive a 1.5x payout.
+            </li>
+            <li>
+              If the player and the dealer both have a hand totaling 21, it results in a tie (push).
+            </li>
+            <li>The highest hand value without exceeding 21 wins.</li>
+          </ul>
+        </div>
+        <button id="help-btn-close" class="game-btn">Close</button>
+      </dialog>
+    </div> <!-- end of settings-container div -->
+    <div title="Your balance." id="balance" class="hidden">
+      <div><img src="img/others/wallet.svg" alt="balance"></div>
+      <span>$<span id="bank-balance">0</span></span>
+    </div>
+    <div id="betting-container" class="hidden">
+      <div id="bet-mid">
+        <button id="place-bet-btn" class="game-btn">BET</button>
+        <span title="Your bet." id="currency-sign">$<span id="first-bet-placeholder">0</span></span>
+      </div>
+    </div>
+    <div id="game-over" class="hidden">
+      <p>Game Over</p>
+      <button id="restart-btn" class="game-btn">Restart</button>
+    </div>
+    <!-- start of round-container div -->
+    <div id="round-container" class="hidden">
+      <div class="remaining-cards" title="Remaining cards.">
+        <img src="img/others/remaining-cards.png" alt="remaining cards"><br><span>0</span>
+      </div>
+      <span class="nick-name">Dealer</span>
+      <div class="dealerHand">
+        <div class="cards"></div>
+        <span id="dealer-score" class="score">0</span>
+        <div class="ribbon hidden" id="dealer-ribbon"></div>
+      </div>
+      <div id="round">
+        <button title="Doubles your bet." id="double-btn" class="chip">X2</button>
+        <div class="bet-img-container">
+          <img id="round-bet-img" title="Your current bet" src="img/others/money.svg">
+          $<span id="round-bet">0</span>
         </div>
       </div>
-    </main>
-  </body>
+      <div class="playerHand">
+        <div class="cards"></div>
+        <span id="player-score" class="score">0</span>
+        <div class="ribbon hidden" id="player-ribbon"></div>
+      </div>
+      <span id="player-name-output" class="nick-name">Player</span>
+    </div> <!-- end of round-container div -->
+    <div id="dark-gradient-splash" class="hidden"></div>
+    <div id="fixed-bottom">
+      <div id="betting-fixed-bottom" class="hidden">
+        <div class="control-chips">
+          <button class="chip red">10</button>
+          <button class="chip orange">50</button>
+          <button class="chip light-blue">100</button>
+          <button class="chip purple">250</button>
+          <button class="chip dark-blue">500</button>
+        </div>
+        <button id="clear-btn" class="game-btn">CLEAR BET</button>
+        <button id="all-in-btn" class="game-btn">ALL IN</button>
+      </div>
+      <div id="round-fixed-bottom" class="hidden">
+        <button id="hit-btn" class="game-btn">HIT</button>
+        <button id="stand-btn" class="game-btn">STAND</button>
+      </div>
+    </div>
+  </main>
+</body>
+
 </html>

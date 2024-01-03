@@ -43,11 +43,11 @@ function removeAllChildren(element) {
 /**
  * Delays the execution of the code for the specified number of milliseconds.
  *
- * @param {number} milliseconds - The number of milliseconds to delay the execution.
+ * @param {number} ms - The number of milliseconds to delay the execution.
  * @return {Promise} A Promise that resolves after the specified number of milliseconds.
  */
-function delay(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds))
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export { updateClass, removeAllChildren, delay }
